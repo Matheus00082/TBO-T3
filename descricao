@@ -1,0 +1,25 @@
+(fornecido) - dado pelo professor;
+(incremental) - incrementado/adicionado durante o processo de leitura de um arquivo;
+(final) - calculado ao final de um passo n;
+
+
+(0) Criação de uma tabela auxiliar de arquivos, para documentar a relação entre eles e ajudar o futuro calculo do PageRank baseada no arquivo graph.txt.
+
+	nome; PageRank (final); quantidade de arquivos de out (fornecido); arquivos de out (fornecido); quantidade de arquivos de in (incremental); arquivos de in (incremetal);obs. : PageRa
+
+obs. : cada arquivo tem seu PageRank inicializado com 1/n; 
+
+(1) Indexador : Mapeia os termos (ou combinação de termos) para os documentos.
+
+	- Vai receber um grupo de n documentos (.txt) e uma lista de s termos a serem ignorados;
+	- Cada documento consiste de termos separados por um ou mais separadores (\t e \n);
+	- Termos são compostos por letras (A/a), números e hífen;
+	
+Criar uma tabela que mapeie cada termo (t) presente nos documentos para a lista de documentos que contêm t (Adicionanr as stopwords presentes em S primeiro e marca-las como desnecessárias).
+obs. : A comparação de strings não é case sensitive. 
+
+	Implementação : Acessar arquivo de index e a cada nome, abre o arquivo correspondente, lê o conteúdo do arquivo e adiciona a uma tabela, se assegurando que em caso de termos presentes em mais de um arquivo, os mesmos serão referenciados.
+
+(2) Ordenador de páginas : Ordena os documentos de acordo com as suas respectivas importâncias.
+
+(3) Processador de consultas : Identifica documentos relacionados ao termo buscado e aprenta-os em ordem decrescente.
