@@ -1,14 +1,5 @@
 #include "noHash.h"
 
-// struct noHash
-// {
-//     char *chave;
-//     void *dado;
-//     noHash *esquerda;
-//     noHash *direita;
-//     int numArquivos;
-// };
-
 noHash *Criar_No_Hash(char *chave, void *dado)
 {
     noHash *novoNo = (noHash *)malloc(sizeof(noHash));
@@ -27,23 +18,26 @@ noHash *Criar_No_Hash(char *chave, void *dado)
     }
 
     novoNo->dado = dado;
-    novoNo->numArquivos = 0;
+    novoNo->numNosNaArvore = 1;
     novoNo->esquerda = NULL;
     novoNo->direita = NULL;
 
     return novoNo;
 }
 
-void Conecta_Nos(noHash *no1, noHash *no2)
+int Conecta_Nos(noHash *no1, noHash *no2)
 {
     if (no1 == NULL || no2 == NULL)
     {
         printf("Nó inválido para conexão.\n");
-        return;
+        return -1;
     }
 
+    no1->numNosNaArvore++;
+
     // se a chave do no1 for maior que a do no2, conecta no lado direito
-    if (strcmp(no1->chave, no2->chave) > 0)
+    int cmp = strcmp(no1->chave, no2->chave);
+    if (cmp > 0)
     {
         if (no1->direita == NULL)
         {
@@ -51,12 +45,10 @@ void Conecta_Nos(noHash *no1, noHash *no2)
         }
         else
         {
-            // se já existe um nó à direita, conecta recursivamente
-            no1->direita->numArquivos++;
             Conecta_Nos(no1->direita, no2);
         }
     }
-    else
+    else if (cmp < 0)
     {
         if (no1->esquerda == NULL)
         {
@@ -64,11 +56,13 @@ void Conecta_Nos(noHash *no1, noHash *no2)
         }
         else
         {
-            // se já existe um nó à esquerda, conecta recursivamente
-            no1->esquerda->numArquivos++;
             Conecta_Nos(no1->esquerda, no2);
         }
+    }else{
+        return 0; // Chaves iguais, não conecta
     }
+
+    return 1;
 }
 
 void Destruir_No_Hash(noHash *no, void (*destruirElemento)(void *elemento))

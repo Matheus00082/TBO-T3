@@ -6,7 +6,6 @@ struct auxiliar
     int qtdLinhas;
 };
 
-// Lê um arquivo e retorna um auxiliar com os nomes das páginas e a quantidade
 auxiliar *Ler_Arquivo(const char *nomeArquivo)
 {
     FILE *arquivo = fopen(nomeArquivo, "r");
@@ -39,7 +38,7 @@ auxiliar *Ler_Arquivo(const char *nomeArquivo)
     while (getline(&buffer, &tamanhoLinha, arquivo) != -1)
     {
         buffer[strcspn(buffer, "\n")] = 0;
-        
+
         if (aux->qtdLinhas >= capacidade)
         {
             capacidade *= 2;
@@ -66,8 +65,7 @@ auxiliar *Ler_Arquivo(const char *nomeArquivo)
     {
         free(buffer);
     }
-    
-    
+
     fclose(arquivo);
     return aux;
 }
@@ -98,8 +96,8 @@ void Destruir_auxiliar(auxiliar *a)
     }
 }
 
-// Cria uma estrutura pagina para cada linha do arquivo
-pagina **Retornar_Paginas(auxiliar *a){
+pagina **Retornar_Paginas(auxiliar *a)
+{
 
     int qtdLinhas = Obter_QtdLinhas(a);
     pagina **paginas = malloc(qtdLinhas * sizeof(pagina *));
@@ -120,9 +118,8 @@ pagina **Retornar_Paginas(auxiliar *a){
     return paginas;
 }
 
-tabelaHash *Cria_Tabela_Arquivos(const char *nomeArquivo, funcaoHash hash){
-
-    auxiliar *a = Ler_Arquivo(nomeArquivo);
+tabelaHash *Cria_Tabela_Arquivos(auxiliar *a, funcaoHash hash)
+{
     int qtdLinhas = Obter_QtdLinhas(a);
     tabelaHash *tabela = Criar_Tabela_Hash(qtdLinhas, hash, Destruir_pagina);
     pagina **paginas = Retornar_Paginas(a);
@@ -131,12 +128,44 @@ tabelaHash *Cria_Tabela_Arquivos(const char *nomeArquivo, funcaoHash hash){
     {
         if (paginas[i] != NULL)
         {
-            Inserir_Elemento(tabela, Obter_Nome_Pagina(paginas[i]), paginas[i]);
+            noHash *novoNo = Criar_No_Hash(Obter_Nome_Pagina(paginas[i]), paginas[i]);
+            Inserir_Elemento(tabela, novoNo);
         }
     }
 
-    Destruir_auxiliar(a);
     free(paginas);
-
     return tabela;
+}
+
+// Abre e lê cada arquivo e insere as palavras na tabela hash
+tabelaHash *Cria_Tabela_Palavras(auxiliar *a, funcaoHash hash)
+{
+    int qtdArquivos = Obter_QtdLinhas(a);
+    char **nomesArquivos = Obter_Linhas(a);
+
+    for (int i = 0; i < qtdArquivos; i++)
+    {
+        char caminhoArquivo[256];
+        snprintf(caminhoArquivo, sizeof(caminhoArquivo), "exemplo/pages/%s", nomesArquivos[i]);
+        FILE *arquivo = fopen(caminhoArquivo, "r");
+        if (arquivo == NULL)
+        {
+            printf("Erro ao abrir o arquivo: %s\n", caminhoArquivo);
+            continue;
+        }
+
+        char *buffer = NULL;
+        size_t tamanhoBuffer = 0;
+
+        while (getline(&buffer, &tamanhoBuffer, arquivo) != -1)
+        {
+            buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
+            printf("Linha lida: %s\n", buffer);
+        }
+
+        free(buffer);
+        fclose(arquivo);
+    }
+
+    return NULL;
 }
