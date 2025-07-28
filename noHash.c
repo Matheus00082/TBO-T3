@@ -51,6 +51,8 @@ void Conecta_Nos(noHash *no1, noHash *no2)
         }
         else
         {
+            // se já existe um nó à direita, conecta recursivamente
+            no1->direita->numArquivos++;
             Conecta_Nos(no1->direita, no2);
         }
     }
@@ -62,6 +64,8 @@ void Conecta_Nos(noHash *no1, noHash *no2)
         }
         else
         {
+            // se já existe um nó à esquerda, conecta recursivamente
+            no1->esquerda->numArquivos++;
             Conecta_Nos(no1->esquerda, no2);
         }
     }
