@@ -1,4 +1,5 @@
 #include "Auxiliar.h"
+#include "Vector.h"
 
 struct Auxiliar {
     char **linhas;
@@ -23,7 +24,7 @@ Auxiliar *ler_arquivo(const char *nomeArquivo) {
 
     char *buffer = NULL;
     size_t tamanho_linha = 0;
-    size_t capacidade = 10;
+    size_t capacidade = CAPACIDADE_INICIAL;
     aux->linhas = calloc(capacidade, sizeof(char *));
 
     if (aux->linhas == NULL) {
@@ -33,7 +34,7 @@ Auxiliar *ler_arquivo(const char *nomeArquivo) {
     }
 
     while (getline(&buffer, &tamanho_linha, arquivo) != -1) {
-        buffer[strcspn(buffer, "\n")] = 0;
+        buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
 
         if (aux->qtd_linhas >= capacidade) {
             capacidade *= 2;
@@ -86,50 +87,45 @@ void destruir_auxiliar(Auxiliar *a) {
     }
 }
 
-Pagina **retornar_paginas(Auxiliar *a) {
-
+TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
     int qtd_linhas = obter_qtd_linhas(a);
-    Pagina **paginas = malloc(qtd_linhas * sizeof(Pagina *));
-
-    if (paginas == NULL) {
-        printf("Erro ao alocar memória para páginas.\n");
-        return NULL;
-    }
-
     char **linhas = obter_linhas(a);
+    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, destruir_pagina);
 
     for (int i = 0; i < qtd_linhas; i++) {
         char *nome_pagina = strdup(linhas[i]);
-        paginas[i] = criar_pagina(nome_pagina, qtd_linhas);
+        Pagina *pagina = criar_pagina(nome_pagina, qtd_linhas);
+        inserir_elemento(tabela, nome_pagina, pagina);
     }
 
-    return paginas;
+    return tabela;
 }
 
-TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
-    int qtd_linhas = obter_qtd_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, destruir_pagina);
-    Pagina **paginas = retornar_paginas(a);
+TabelaHash *cria_tabela_stop_words(func_hash hash) {
+    Auxiliar *aux = ler_arquivo("exemplo/stopwords.txt");
+    int qtd_linhas = obter_qtd_linhas(aux);
+    char **linhas = obter_linhas(aux);
+    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, free);
 
     for (int i = 0; i < qtd_linhas; i++) {
-        if (paginas[i] != NULL) {
-            Node *novo_node = criar_node(obter_nome_pagina(paginas[i]), paginas[i]);
-            inserir_elemento(tabela, novo_node);
-        }
+        char *palavra = strdup(linhas[i]);
+        inserir_elemento(tabela, palavra, palavra);
     }
 
-    free(paginas);
+    destruir_auxiliar(aux);
     return tabela;
 }
 
 // Abre e lê cada arquivo e insere as palavras na tabela hash
-TabelaHash *cria_tabela_palavras(Auxiliar *a, func_hash hash) {
-    int qtdArquivos = obter_qtd_linhas(a);
+TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words ,func_hash hash) {
+    int qtd_arquivos = obter_qtd_linhas(a);
     char **nome_arquivos = obter_linhas(a);
+    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, free);
 
-    for (int i = 0; i < qtdArquivos; i++) {
+    for (int i = 0; i < qtd_arquivos; i++) {
         char caminho_arquivo[256];
-        snprintf(caminho_arquivo, sizeof(caminho_arquivo), "exemplo/pages/%s", nome_arquivos[i]);
+        char *nome_arquivo = strdup(nome_arquivos[i]);
+        snprintf(caminho_arquivo, sizeof(caminho_arquivo), "exemplo/pages/%s", nome_arquivo);
         FILE *arquivo = fopen(caminho_arquivo, "r");
 
         if (arquivo == NULL) {
@@ -141,8 +137,28 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, func_hash hash) {
         size_t tamanho_buffer = 0;
 
         while (getline(&buffer, &tamanho_buffer, arquivo) != -1) {
-            buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
-            printf("Linha lida: %s\n", buffer);
+            // buffer[strcspn(buffer, "\n")] = 0;     // Remove newline character
+            char *palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulações ou quebras de linha
+
+            while (palavra != NULL) {
+                if (buscar_elemento(stop_words, palavra) == NULL) {
+                    Vector *v = (Vector *)buscar_elemento(tabela, palavra);
+
+                    if (v == NULL) {
+                        v = criar_vector();
+                        vector_push_back(v, nome_arquivo);
+                        char *palavra_copia = strdup(palavra);
+                        inserir_elemento(tabela, palavra_copia, v);
+                    }
+                    else {
+                        if (vector_find(v, nome_arquivo, strcmp) == -1) {
+                            vector_push_back(v, nome_arquivo);
+                        }
+                    }
+                }
+
+                palavra = strtok(NULL, " \t\n");
+            }
         }
 
         free(buffer);

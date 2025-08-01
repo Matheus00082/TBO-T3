@@ -6,8 +6,8 @@
 #include "Auxiliar.h"
 #include "Pagina.h"
 
-unsigned long hash(TabelaHash *tabela, void *key) {
-    char *str = (char *)key;
+unsigned long hash(TabelaHash *tabela, void *chave) {
+    char *str = (char *)chave;
     int tamanho_tabela = tamanho_tabela_hash(tabela);
     unsigned long hash_val = 0, base = 27183;
     unsigned long random_val = 31415;
@@ -24,9 +24,10 @@ unsigned long hash(TabelaHash *tabela, void *key) {
 
 int main(int argc, char const *argv[]) {
     Auxiliar *aux = ler_arquivo("exemplo/index.txt");
-    TabelaHash *tabela_de_arquivos = cria_tabela_arquivos(aux, hash); // Ainda não sei se o nome do arquivo é fixo ou variável
-    TabelaHash *tabela_de_palavras = cria_tabela_palavras(aux, hash);
-
+    TabelaHash *tabela_de_arquivos = cria_tabela_arquivos(aux, hash);
+    TabelaHash *stop_words = cria_tabela_stop_words(hash);
+    TabelaHash *tabela_de_palavras = cria_tabela_palavras(aux, stop_words, hash);
+    
     char *buffer = NULL;
     size_t tamanho_buffer = 0;
     FILE *arquivo = fopen("exemplo/searches.txt", "r");

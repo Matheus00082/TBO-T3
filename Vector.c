@@ -77,7 +77,7 @@ data_type vector_set(Vector *v, int i, data_type val) {
 
 // Retorna o índice da primeira ocorrência do item no Vector ou -1 se o elemento não for encontrado.
 int vector_find(Vector *v, data_type val, compare c) {
-    for (int i = 0; i < vector_size(v); i++) {
+    for (int i = 0; i < v->size; i++) {
         if (c(val, vector_get(v, i))) {
             return i;
         }

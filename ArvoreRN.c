@@ -4,7 +4,7 @@ struct ArvoreRN {
     NodeRN *raiz;
 };
 
-NodeRN *criar_node_rn(char *chave, void *dado, NodeRN *nil) {
+NodeRN *criar_node_rn(char *chave, void *valor) {
     NodeRN *novo_no = (NodeRN *)malloc(sizeof(NodeRN));
 
     if (novo_no == NULL) {
@@ -20,7 +20,7 @@ NodeRN *criar_node_rn(char *chave, void *dado, NodeRN *nil) {
         return NULL;
     }
     
-    novo_no->dado = dado;
+    novo_no->valor = valor;
     novo_no->esquerda = NULL;
     novo_no->direita = NULL;
     novo_no->pai = NULL;
@@ -38,7 +38,7 @@ void destruir_node_rn(NodeRN *node, func_destruir destruir_elemento) {
         free(node->chave);
 
         if (destruir_elemento != NULL) {
-            destruir_elemento(node->dado);
+            destruir_elemento(node->valor);
         }
 
         free(node);
@@ -102,7 +102,7 @@ void arvore_rn_destruir(ArvoreRN *arvore, func_destruir destruir_elemento) {
     }
 }
 
-void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *dado) {
+void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *valor) {
     //pass
 }
 
@@ -114,7 +114,7 @@ void *arvore_rn_buscar(ArvoreRN *arvore, char *chave) {
     NodeRN *no = buscar_node(arvore->raiz, chave);
     
     if (no != NULL) {
-        return no->dado;
+        return no->valor;
     }
     
     return NULL;

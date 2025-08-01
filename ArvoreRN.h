@@ -15,7 +15,7 @@ typedef enum {
 // Estrutura do nó da árvore rubro-negra
 typedef struct NodeRN {
     char *chave;
-    void *dado;
+    void *valor;
     struct NodeRN *esquerda;
     struct NodeRN *direita;
     struct NodeRN *pai;

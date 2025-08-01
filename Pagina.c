@@ -5,9 +5,11 @@ struct Pagina {
     double page_rank;
     int qtd_links_entrada;
     int qtd_links_saida;
+    int *links_saida;
+    int *links_entrada;
 };
 
-Pagina *criar_pagina(char *nome, double numpaginas) {
+Pagina *criar_pagina(char *nome, double num_paginas) {
     Pagina *nova_pagina = (Pagina *)malloc(sizeof(Pagina));
 
     if (nova_pagina == NULL) {
@@ -16,7 +18,7 @@ Pagina *criar_pagina(char *nome, double numpaginas) {
     }
 
     nova_pagina->nome = nome;
-    nova_pagina->page_rank = 1 / numpaginas; // Inicializa o PageRank com 1/n
+    nova_pagina->page_rank = 1 / num_paginas; // Inicializa o PageRank com 1/n
     nova_pagina->qtd_links_entrada = 0;
     nova_pagina->qtd_links_saida = 0;
     return nova_pagina;
