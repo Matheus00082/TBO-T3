@@ -1,89 +1,79 @@
 #include "Node.h"
 
-Node *Criar_Node(char *chave, void *dado)
-{
-    Node *novoNo = (Node *)malloc(sizeof(Node));
-    if (novoNo == NULL)
-    {
+Node *criar_node(char *chave, void *dado) {
+    Node *novo_node = (Node *)malloc(sizeof(Node));
+
+    if (novo_node == NULL) {
         printf("Erro ao alocar memória para o nó.\n");
         return NULL;
     }
 
-    novoNo->chave = strdup(chave);
-    if (novoNo->chave == NULL)
-    {
+    novo_node->chave = strdup(chave);
+    
+    if (novo_node->chave == NULL) {
         printf("Erro ao alocar memória para a chave.\n");
-        free(novoNo);
+        free(novo_node);
         return NULL;
     }
 
-    novoNo->dado = dado;
-    novoNo->numNosNaArvore = 1;
-    novoNo->esquerda = NULL;
-    novoNo->direita = NULL;
-
-    return novoNo;
+    novo_node->dado = dado;
+    novo_node->num_nodes_arvore = 1;
+    novo_node->esquerda = NULL;
+    novo_node->direita = NULL;
+    return novo_node;
 }
 
-int Conecta_Node(Node *no1, Node *no2)
-{
-    if (no1 == NULL || no2 == NULL)
-    {
+int conecta_node(Node *node1, Node *node2) {
+    if (node1 == NULL || node2 == NULL) {
         printf("Nó inválido para conexão.\n");
         return -1;
     }
 
-    no1->numNosNaArvore++;
+    node1->num_nodes_arvore++;
 
     // se a chave do no1 for maior que a do no2, conecta no lado direito
-    int cmp = strcmp(no1->chave, no2->chave);
-    if (cmp > 0)
-    {
-        if (no1->direita == NULL)
-        {
-            no1->direita = no2;
+    int cmp = strcmp(node1->chave, node2->chave);
+
+    if (cmp > 0) {
+        if (node1->direita == NULL) {
+            node1->direita = node2;
         }
-        else
-        {
-            Conecta_Node(no1->direita, no2);
+        else {
+            conecta_node(node1->direita, node2);
         }
     }
-    else if (cmp < 0)
-    {
-        if (no1->esquerda == NULL)
-        {
-            no1->esquerda = no2;
+    else if (cmp < 0) {
+        if (node1->esquerda == NULL) {
+            node1->esquerda = node2;
         }
-        else
-        {
-            Conecta_Node(no1->esquerda, no2);
+        else {
+            conecta_node(node1->esquerda, node2);
         }
-    }else{
+    }
+    else {
         return 0; // Chaves iguais, não conecta
     }
 
     return 1;
 }
 
-void Destruir_Node(Node *no, void (*destruirElemento)(void *elemento))
-{
-    if (no != NULL)
-    {
-        free(no->chave);
-        if (destruirElemento != NULL)
-        {
-            destruirElemento(no->dado);
+void destruir_node(Node *node, void (*destruir_elemento)(void *elemento)) {
+    if (node != NULL) {
+        free(node->chave);
+
+        if (destruir_elemento != NULL) {
+            destruir_elemento(node->dado);
         }
-        free(no);
+
+        free(node);
     }
 }
 
-void Destruir_Nodes(Node *no, void (*destruirElemento)(void *))
+void destruir_nodes(Node *node, void (*destruir_elemento)(void *))
 {
-    if (no != NULL)
-    {
-        Destruir_Node(no->esquerda, destruirElemento);
-        Destruir_Node(no->direita, destruirElemento);
-        Destruir_Node(no, destruirElemento);
+    if (node != NULL) {
+        destruir_node(node->esquerda, destruir_elemento);
+        destruir_node(node->direita, destruir_elemento);
+        destruir_node(node, destruir_elemento);
     }
 }

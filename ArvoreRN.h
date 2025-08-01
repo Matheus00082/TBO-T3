@@ -1,11 +1,12 @@
-#ifndef _ARVORE_RUBRO_NEGRA
-#define _ARVORE_RUBRO_NEGRA
+#ifndef ARVORE_RUBRO_NEGRA_H
+#define ARVORE_RUBRO_NEGRA_H
 
 #include <stdbool.h>
 
-typedef struct arvoreRN arvoreRN;
+typedef struct ArvoreRN ArvoreRN;
 
-arvoreRN* arvoreRN_construtor();
-void arvoreRN_destrutor(arvoreRN* rn);
+ArvoreRN *arvoreRN_construtor();
+
+void arvoreRN_destrutor(ArvoreRN *rn);
 
 #endif

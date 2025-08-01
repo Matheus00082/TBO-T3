@@ -9,6 +9,3 @@ Palavra* palavra_construtor(Vector* arquivos, char* palvra);
 void palavra_destrutor(Palavra* p);
 
 #endif
-
-
-

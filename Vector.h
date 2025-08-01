@@ -1,14 +1,14 @@
 
-#ifndef _DATA_STRUCTURES_VECTOR_H_
-#define _DATA_STRUCTURES_VECTOR_H_
+#ifndef VECTOR_H
+#define VECTOR_H
 
-typedef void* data_type;
-typedef int (*compare)(const void*, const void*);
-typedef void (*destroyFn) (void*);
+typedef void *data_type;
+typedef int (*compare)(const void *, const void *);
+typedef void (*destroy_fn)(void *);
 typedef struct Vector Vector;
 
 // Cria um vetor vazio
-Vector *vector_construct();
+Vector *vector_construct(destroy_fn dst_fn);
 
 // Adiciona um elemento no final do vetor
 void vector_push_back(Vector *v, data_type val);
@@ -22,26 +22,11 @@ data_type vector_set(Vector *v, int i, data_type val);
 // Retorna o tamanho do vetor
 int vector_size(Vector *v);
 
-// Retorna o indice do primeiro elemento com valor val. Retorna -1 se nao encontrado.
+// Retorna o índice do primeiro elemento com valor val. Retorna -1 se nao encontrado.
 int vector_find(Vector *v, data_type val, compare c);
-
-// // Retorna o maior elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
-// data_type vector_max(Vector *v, int (*compare)(data_type, data_type));
-
-// // Retorna o menor elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
-// data_type vector_min(Vector *v, int (*compare)(data_type, data_type));
-
-// // Retorna o índice do maior elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
-// int vector_argmax(Vector *v);
-
-// // Retorna o índice do menor elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
-// int vector_argmin(Vector *v);
 
 // Remove o i-ésimo elemento do vetor.
 data_type vector_remove(Vector *v, int i);
-
-// Remove o primeiro elemento
-data_type vector_pop_front(Vector *v);
 
 // Remove o ultimo elemento
 data_type vector_pop_back(Vector *v);
@@ -57,15 +42,6 @@ void vector_sort(Vector *v, compare c);
 
 // Retorna o indice de val usando busca binaria. Retorna -1 se nao encontrado.
 int vector_binary_search(Vector *v, data_type val, compare c);
-
-// Inverte o vetor in-place (sem criar um novo vetor)
-void vector_reverse(Vector *v);
-
-// Cria uma cópia do vector e dos valores de seus atributos.
-Vector *vector_copy(Vector *v);
-
-// Remove todos os elementos de v
-void vector_clear(Vector *v);
 
 // Libera a memoria alocada para o vetor
 void vector_destroy(Vector *v);

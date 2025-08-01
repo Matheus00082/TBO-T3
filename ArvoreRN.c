@@ -4,14 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct ArvoreRN{
-    Node** nodes;
-
+struct ArvoreRN {
+    Node **nodes;
 };
 
-arvoreRN* arvoreRN_construtor() {
-
+ArvoreRN *arvoreRN_construtor() {
 }
-void arvoreRN_destrutor(arvoreRN* rn) {
 
+void arvoreRN_destrutor(ArvoreRN *rn) {
 }

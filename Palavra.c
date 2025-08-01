@@ -1,7 +1,6 @@
 #include "Palavra.h"
 
-struct Palavra
-{
+struct Palavra {
     Vector* arquivos;
     char* palavra;
 };
