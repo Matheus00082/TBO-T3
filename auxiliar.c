@@ -128,7 +128,7 @@ tabelaHash *Cria_Tabela_Arquivos(auxiliar *a, funcaoHash hash)
     {
         if (paginas[i] != NULL)
         {
-            noHash *novoNo = Criar_No_Hash(Obter_Nome_Pagina(paginas[i]), paginas[i]);
+            Node *novoNo = Criar_Node(Obter_Nome_Pagina(paginas[i]), paginas[i]);
             Inserir_Elemento(tabela, novoNo);
         }
     }

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "noHash.h"
+#include "Node.h"
 
 typedef struct tabelaHash tabelaHash;
 
@@ -15,7 +15,7 @@ typedef void (*funcaoDestruir)(void *elemento); // Ponteiro para função de des
 tabelaHash *Criar_Tabela_Hash(int tamanho, funcaoHash hash, funcaoDestruir destruirElemento);
 
 // @ Insere um elemento na tabela hash
-void Inserir_Elemento(tabelaHash *tabela, noHash *novoNo);
+void Inserir_Elemento(tabelaHash *tabela, Node *novoNo);
 
 // @ Busca um elemento na tabela hash
 void *Buscar_Elemento(tabelaHash *tabela, char *chave);

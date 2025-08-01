@@ -2,7 +2,7 @@
 
 struct tabelaHash
 {
-    noHash **tabela;                 // Array de ponteiros para nós da tabela hash
+    Node **tabela;                 // Array de ponteiros para nós da tabela hash
     int tamanho;                     // Tamanho da tabela hash
     int qtdElementos;                // Quantidade de elementos na tabela hash
     funcaoHash hash;                 // Função de hash
@@ -22,7 +22,7 @@ tabelaHash *Criar_Tabela_Hash(int tamanho, funcaoHash hash, funcaoDestruir destr
     novaTabela->qtdElementos = 0;
     novaTabela->hash = hash;
     novaTabela->destruirElemento = destruirElemento;
-    novaTabela->tabela = calloc(tamanho, sizeof(noHash *));
+    novaTabela->tabela = calloc(tamanho, sizeof(Node *));
 
     if (novaTabela->tabela == NULL)
     {
@@ -34,7 +34,7 @@ tabelaHash *Criar_Tabela_Hash(int tamanho, funcaoHash hash, funcaoDestruir destr
     return novaTabela;
 }
 
-void Inserir_Elemento(tabelaHash *tabela, noHash *novoNo)
+void Inserir_Elemento(tabelaHash *tabela, Node *novoNo)
 {
     if (tabela == NULL || novoNo == NULL)
     {
@@ -52,7 +52,7 @@ void Inserir_Elemento(tabelaHash *tabela, noHash *novoNo)
     if (tabela->tabela[indice] == NULL)
         tabela->tabela[indice] = novoNo;
     else
-        Conecta_Nos(tabela->tabela[indice], novoNo);
+        Conecta_Node(tabela->tabela[indice], novoNo);
 
     tabela->qtdElementos++;
 
@@ -60,7 +60,7 @@ void Inserir_Elemento(tabelaHash *tabela, noHash *novoNo)
     if (tabela->qtdElementos >= tabela->tamanho)
     {
         int novoTamanho = tabela->tamanho * 2;
-        noHash **novaTabela = calloc(novoTamanho, sizeof(noHash *));
+        Node **novaTabela = calloc(novoTamanho, sizeof(Node *));
         if (novaTabela == NULL)
         {
             printf("Erro ao alocar nova tabela.\n");
@@ -68,7 +68,7 @@ void Inserir_Elemento(tabelaHash *tabela, noHash *novoNo)
         }
 
         // Salva dados antigos
-        noHash **tabelaAntiga = tabela->tabela;
+        Node **tabelaAntiga = tabela->tabela;
         int tamanhoAntigo = tabela->tamanho;
 
         // Atualiza a tabela
@@ -98,7 +98,7 @@ void *Buscar_Elemento(tabelaHash *tabela, char *chave)
     }
 
     int indice = tabela->hash(chave, tabela->tamanho);
-    noHash *noAtual = tabela->tabela[indice];
+    Node *noAtual = tabela->tabela[indice];
     if (noAtual == NULL)
     {
         printf("Nenhum elemento encontrado para a chave: %s\n", chave);
@@ -133,7 +133,7 @@ void Destruir_Tabela_Hash(tabelaHash *tabela)
         {
             if (tabela->tabela[i] != NULL)
             {
-                Destruir_Nos_Hash(tabela->tabela[i], tabela->destruirElemento);
+                Destruir_Nodes(tabela->tabela[i], tabela->destruirElemento);
                 tabela->tabela[i] = NULL;
             }
         }

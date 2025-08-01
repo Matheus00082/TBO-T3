@@ -1,8 +1,8 @@
-#include "noHash.h"
+#include "Node.h"
 
-noHash *Criar_No_Hash(char *chave, void *dado)
+Node *Criar_Node(char *chave, void *dado)
 {
-    noHash *novoNo = (noHash *)malloc(sizeof(noHash));
+    Node *novoNo = (Node *)malloc(sizeof(Node));
     if (novoNo == NULL)
     {
         printf("Erro ao alocar memória para o nó.\n");
@@ -25,7 +25,7 @@ noHash *Criar_No_Hash(char *chave, void *dado)
     return novoNo;
 }
 
-int Conecta_Nos(noHash *no1, noHash *no2)
+int Conecta_Node(Node *no1, Node *no2)
 {
     if (no1 == NULL || no2 == NULL)
     {
@@ -45,7 +45,7 @@ int Conecta_Nos(noHash *no1, noHash *no2)
         }
         else
         {
-            Conecta_Nos(no1->direita, no2);
+            Conecta_Node(no1->direita, no2);
         }
     }
     else if (cmp < 0)
@@ -56,7 +56,7 @@ int Conecta_Nos(noHash *no1, noHash *no2)
         }
         else
         {
-            Conecta_Nos(no1->esquerda, no2);
+            Conecta_Node(no1->esquerda, no2);
         }
     }else{
         return 0; // Chaves iguais, não conecta
@@ -65,7 +65,7 @@ int Conecta_Nos(noHash *no1, noHash *no2)
     return 1;
 }
 
-void Destruir_No_Hash(noHash *no, void (*destruirElemento)(void *elemento))
+void Destruir_Node(Node *no, void (*destruirElemento)(void *elemento))
 {
     if (no != NULL)
     {
@@ -78,12 +78,12 @@ void Destruir_No_Hash(noHash *no, void (*destruirElemento)(void *elemento))
     }
 }
 
-void Destruir_Nos_Hash(noHash *no, void (*destruirElemento)(void *))
+void Destruir_Nodes(Node *no, void (*destruirElemento)(void *))
 {
     if (no != NULL)
     {
-        Destruir_Nos_Hash(no->esquerda, destruirElemento);
-        Destruir_Nos_Hash(no->direita, destruirElemento);
-        Destruir_No_Hash(no, destruirElemento);
+        Destruir_Node(no->esquerda, destruirElemento);
+        Destruir_Node(no->direita, destruirElemento);
+        Destruir_Node(no, destruirElemento);
     }
 }
