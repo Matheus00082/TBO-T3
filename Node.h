@@ -20,7 +20,7 @@ Node *criar_node(char *chave, void *dado);
 // @ Conecta dois nós hash que colidem na mesma posição da tabela hash
 int conecta_node(Node *node1, Node *node2);
 
-// @ Destrói um nó hash
-void destruir_nodes(Node *node, void (*destruir_elemento)(void *elemento));
+// @ Destrói os nós da árvore binária de busca
+void destruir_bst(Node *node, void (*destruir_elemento)(void *elemento));
 
 #endif

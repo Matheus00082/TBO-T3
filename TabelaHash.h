@@ -8,11 +8,14 @@
 
 typedef struct TabelaHash TabelaHash;
 
-typedef unsigned long (*func_hash)(char *chave, int tamanho); // Ponteiro para função de hash
+typedef unsigned long (*func_hash)(TabelaHash *tabela, void *key); // Ponteiro para função de hash
 typedef void (*func_destruir)(void *elemento);                // Ponteiro para função de destruição de elemento
 
 // @ Cria uma nova tabela hash
 TabelaHash *criar_tabela_hash(int tamanho, func_hash hash, func_destruir destruir_elemento);
+
+// @ Tamanho da tabela
+int tamanho_tabela_hash(TabelaHash *tabela);
 
 // @ Insere um elemento na tabela hash
 void inserir_elemento(TabelaHash *tabela, Node *novo_no);

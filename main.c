@@ -6,16 +6,20 @@
 #include "Auxiliar.h"
 #include "Pagina.h"
 
-unsigned long hash(char *str, int tamanho) {
-    unsigned long hash = 5381;
-    int c;
+unsigned long hash(TabelaHash *tabela, void *key) {
+    char *str = (char *)key;
+    int tamanho_tabela = tamanho_tabela_hash(tabela);
+    unsigned long hash_val = 0, base = 27183;
+    unsigned long random_val = 31415;
+    int tamanho_chave = strlen(str);
 
-    while ((c = *str++))
-    {
-        hash = ((hash << 5) + hash) + c;
+    for (int i = 0; i < tamanho_chave; i++) {
+        hash_val = (hash_val * random_val + str[i]) % tamanho_tabela;
+
+        random_val = (random_val * base) % (tamanho_tabela - 1);
     }
 
-    return hash % tamanho;
+    return hash_val;
 }
 
 int main(int argc, char const *argv[]) {

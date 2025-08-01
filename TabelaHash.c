@@ -31,13 +31,22 @@ TabelaHash *criar_tabela_hash(int tamanho, func_hash hash, func_destruir destrui
     return nova_tabela;
 }
 
+int tamanho_tabela_hash(TabelaHash *tabela) {
+    if (tabela == NULL) {
+        printf("Tabela inválida.\n");
+        return -1;
+    }
+
+    return tabela->tamanho;
+}
+
 void inserir_elemento(TabelaHash *tabela, Node *novo_no) {
     if (tabela == NULL || novo_no == NULL) {
         printf("Tabela ou elemento inválido.\n");
         return;
     }
 
-    int indice = tabela->hash(novo_no->chave, tabela->tamanho);
+    int indice = tabela->hash(tabela, novo_no->chave);
 
     if (indice == -1) {
         printf("Erro ao calcular índice da tabela hash.\n");
@@ -53,34 +62,34 @@ void inserir_elemento(TabelaHash *tabela, Node *novo_no) {
 
     tabela->qtd_elementos++;
 
-    // Redimensionar a tabela hash
-    if (tabela->qtd_elementos >= tabela->tamanho) {
-        int novo_tamanho = tabela->tamanho * 2;
-        Node **nova_tabela = calloc(novo_tamanho, sizeof(Node *));
+    // // Redimensionar a tabela hash
+    // if (tabela->qtd_elementos >= tabela->tamanho) {
+    //     int novo_tamanho = tabela->tamanho * 2;
+    //     Node **nova_tabela = calloc(novo_tamanho, sizeof(Node *));
 
-        if (nova_tabela == NULL) {
-            printf("Erro ao alocar nova tabela.\n");
-            return;
-        }
+    //     if (nova_tabela == NULL) {
+    //         printf("Erro ao alocar nova tabela.\n");
+    //         return;
+    //     }
 
-        // Salva dados antigos
-        Node **tabela_antiga = tabela->tabela;
-        int tamanho_antigo = tabela->tamanho;
+    //     // Salva dados antigos
+    //     Node **tabela_antiga = tabela->tabela;
+    //     int tamanho_antigo = tabela->tamanho;
 
-        // Atualiza a tabela
-        tabela->tabela = nova_tabela;
-        tabela->tamanho = novo_tamanho;
-        tabela->qtd_elementos = 0; // será recontado ao reinserir
+    //     // Atualiza a tabela
+    //     tabela->tabela = nova_tabela;
+    //     tabela->tamanho = novo_tamanho;
+    //     tabela->qtd_elementos = 0; // será recontado ao reinserir
 
-        // Reinsere todos os elementos da tabela antiga
-        for (int i = 0; i < tamanho_antigo; i++) {
-            if (tabela_antiga[i] != NULL) {
-                inserir_elemento(tabela, tabela_antiga[i]);
-            }
-        }
+    //     // Reinsere todos os elementos da tabela antiga
+    //     for (int i = 0; i < tamanho_antigo; i++) {
+    //         if (tabela_antiga[i] != NULL) {
+    //             inserir_elemento(tabela, tabela_antiga[i]);
+    //         }
+    //     }
 
-        free(tabela_antiga);
-    }
+    //     free(tabela_antiga);
+    // }
 }
 
 void *buscar_elemento(TabelaHash *tabela, char *chave) {
@@ -89,7 +98,7 @@ void *buscar_elemento(TabelaHash *tabela, char *chave) {
         return NULL;
     }
 
-    int indice = tabela->hash(chave, tabela->tamanho);
+    int indice = tabela->hash(tabela, chave);
     Node *no_atual = tabela->tabela[indice];
 
     if (no_atual == NULL) {
@@ -118,7 +127,7 @@ void destruir_tabela_hash(TabelaHash *tabela) {
     if (tabela != NULL) {
         for (int i = 0; i < tabela->tamanho; i++) {
             if (tabela->tabela[i] != NULL) {
-                destruir_nodes(tabela->tabela[i], tabela->destruir_elemento);
+                destruir_bst(tabela->tabela[i], tabela->destruir_elemento);
                 tabela->tabela[i] = NULL;
             }
         }

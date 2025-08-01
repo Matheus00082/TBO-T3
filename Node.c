@@ -57,8 +57,13 @@ int conecta_node(Node *node1, Node *node2) {
     return 1;
 }
 
-void destruir_node(Node *node, void (*destruir_elemento)(void *elemento)) {
+void destruir_bst(Node *node, void (*destruir_elemento)(void *elemento)) {
     if (node != NULL) {
+        // Destrói recursivamente os filhos primeiro
+        destruir_bst(node->esquerda, destruir_elemento);
+        destruir_bst(node->direita, destruir_elemento);
+        
+        // Depois destrói o nó atual
         free(node->chave);
 
         if (destruir_elemento != NULL) {
@@ -66,14 +71,5 @@ void destruir_node(Node *node, void (*destruir_elemento)(void *elemento)) {
         }
 
         free(node);
-    }
-}
-
-void destruir_nodes(Node *node, void (*destruir_elemento)(void *))
-{
-    if (node != NULL) {
-        destruir_node(node->esquerda, destruir_elemento);
-        destruir_node(node->direita, destruir_elemento);
-        destruir_node(node, destruir_elemento);
     }
 }

@@ -148,6 +148,6 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, func_hash hash) {
         free(buffer);
         fclose(arquivo);
     }
-
+    
     return NULL;
 }
