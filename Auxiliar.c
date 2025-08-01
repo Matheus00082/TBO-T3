@@ -117,10 +117,10 @@ TabelaHash *cria_tabela_stop_words(func_hash hash) {
 }
 
 // Abre e lê cada arquivo e insere as palavras na tabela hash
-TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words ,func_hash hash) {
+TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash hash) {
     int qtd_arquivos = obter_qtd_linhas(a);
     char **nome_arquivos = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, free);
+    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, vector_destroy);
 
     for (int i = 0; i < qtd_arquivos; i++) {
         char caminho_arquivo[256];
@@ -145,7 +145,7 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words ,func_hash 
                     Vector *v = (Vector *)buscar_elemento(tabela, palavra);
 
                     if (v == NULL) {
-                        v = criar_vector();
+                        v = vector_construct(free);
                         vector_push_back(v, nome_arquivo);
                         char *palavra_copia = strdup(palavra);
                         inserir_elemento(tabela, palavra_copia, v);
