@@ -81,11 +81,11 @@ void mudar_cor(NodeRN *x) {
     x->direita->cor = PRETO;
 }
 
-int ehVermelho(NodeRN *node) {
+int eh_vermelho(NodeRN *node) {
     return node != NULL && node->cor == VERMELHO;
 }
 
-int ehPreto(NodeRN *node) {
+int eh_preto(NodeRN *node) {
     return node == NULL || node->cor == PRETO;
 }
 
@@ -155,15 +155,15 @@ NodeRN *inserir_node(NodeRN *x, char *chave, void *valor, func_destruir destruir
         x->valor = valor;
     }
 
-    if (ehVermelho(x->direita) && !ehVermelho(x->esquerda)) {
+    if (eh_vermelho(x->direita) && !eh_vermelho(x->esquerda)) {
         x = rotacao_esquerda(x);
     }
 
-    if (ehVermelho(x->esquerda) && ehVermelho(x->esquerda->esquerda)) {
+    if (eh_vermelho(x->esquerda) && eh_vermelho(x->esquerda->esquerda)) {
         x = rotacao_direita(x);
     }
 
-    if (ehVermelho(x->esquerda) && ehVermelho(x->direita)) {
+    if (eh_vermelho(x->esquerda) && eh_vermelho(x->direita)) {
         mudar_cor(x);
     }
 
