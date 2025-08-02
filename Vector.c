@@ -41,6 +41,13 @@ void vector_destroy(Vector *v)
     free(v);
 }
 
+void vector_destroy_func(void *v) {
+    if (v != NULL) {
+        Vector *vector = (Vector *)v;
+        vector_destroy(vector);
+    }
+}
+
 // Adiciona o item dado ao final do vector e aumenta o tamanho. Aumenta a capacidade alocada se necessário.
 void vector_push_back(Vector *v, data_type val) {
 

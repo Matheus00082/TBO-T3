@@ -26,4 +26,6 @@ void *buscar_elemento(TabelaHash *tabela, char *chave);
 // @ Destrói a tabela hash e libera a memória alocada
 void destruir_tabela_hash(TabelaHash *tabela);
 
+void imprimir_tabela_hash(TabelaHash *tabela);
+
 #endif

@@ -23,8 +23,8 @@ NodeRN *criar_node_rn(char *chave, void *valor) {
     novo_no->valor = valor;
     novo_no->esquerda = NULL;
     novo_no->direita = NULL;
-    novo_no->pai = NULL;
     novo_no->cor = VERMELHO; // Novos nós sempre começam vermelhos
+    novo_no->tamanho = 1; // Inicializa o número de nós na subárvore como 1 (o próprio nó)
     return novo_no;
 }
 
@@ -45,16 +45,48 @@ void destruir_node_rn(NodeRN *node, func_destruir destruir_elemento) {
     }
 }
 
-void rotacao_esquerda(ArvoreRN *arvore, NodeRN *x) {
-    //pass
+int get_tamanho(NodeRN *node) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    return node->tamanho;
 }
 
-void rotacao_direita(ArvoreRN *arvore, NodeRN *x) {
-   //pass
+NodeRN *rotacao_esquerda(NodeRN *x) {
+    NodeRN *y = x->direita;
+    x->direita = y->esquerda;
+    y->esquerda = x;
+    y->cor = x->cor;
+    x->cor = VERMELHO; 
+    y->tamanho = x->tamanho;
+    x->tamanho = 1 + get_tamanho(x->esquerda) + get_tamanho(x->direita);
+    return y;
 }
 
-void color_flip(NodeRN *node) {
-    //pass
+NodeRN *rotacao_direita(NodeRN *x) {
+    NodeRN *y = x->esquerda;
+    x->esquerda = y->direita;
+    y->direita = x;
+    y->cor = x->cor;
+    x->cor = VERMELHO; 
+    y->tamanho = x->tamanho;
+    x->tamanho = 1 + get_tamanho(x->esquerda) + get_tamanho(x->direita);
+    return y;
+}
+
+void mudar_cor(NodeRN *x) {
+    x->cor = VERMELHO;
+    x->esquerda->cor = PRETO;
+    x->direita->cor = PRETO;
+}
+
+int ehVermelho(NodeRN *node) {
+    return node != NULL && node->cor == VERMELHO;
+}
+
+int ehPreto(NodeRN *node) {
+    return node == NULL || node->cor == PRETO;
 }
 
 NodeRN *buscar_node(NodeRN *node, char *chave) {
@@ -102,8 +134,46 @@ void arvore_rn_destruir(ArvoreRN *arvore, func_destruir destruir_elemento) {
     }
 }
 
-void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *valor) {
-    //pass
+NodeRN *inserir_node(NodeRN *x, char *chave, void *valor, func_destruir destruir_elemento) {
+    if (x == NULL) {
+        return criar_node_rn(chave, valor);
+    }
+
+    int cmp = strcmp(chave, x->chave);
+
+    if (cmp < 0) {
+        x->esquerda = inserir_node(x->esquerda, chave, valor, destruir_elemento);
+    } 
+    else if (cmp > 0) {
+        x->direita = inserir_node(x->direita, chave, valor, destruir_elemento);
+    } 
+    else {
+        if (x->valor != NULL) {
+            destruir_elemento(x->valor);
+        }
+        
+        x->valor = valor;
+    }
+
+    if (ehVermelho(x->direita) && !ehVermelho(x->esquerda)) {
+        x = rotacao_esquerda(x);
+    }
+
+    if (ehVermelho(x->esquerda) && ehVermelho(x->esquerda->esquerda)) {
+        x = rotacao_direita(x);
+    }
+
+    if (ehVermelho(x->esquerda) && ehVermelho(x->direita)) {
+        mudar_cor(x);
+    }
+
+    x->tamanho = get_tamanho(x->esquerda) + get_tamanho(x->direita) + 1;
+    return x;
+}
+
+void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *valor, func_destruir destruir_elemento) {
+    arvore->raiz = inserir_node(arvore->raiz, chave, valor, destruir_elemento);
+    arvore->raiz->cor = PRETO;
 }
 
 void *arvore_rn_buscar(ArvoreRN *arvore, char *chave) {

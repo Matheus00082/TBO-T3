@@ -18,20 +18,21 @@ typedef struct NodeRN {
     void *valor;
     struct NodeRN *esquerda;
     struct NodeRN *direita;
-    struct NodeRN *pai;
-    Cor cor;
+   Cor cor;
+   int tamanho; // Número de nós na subárvore
 } NodeRN;
 
 // Estrutura da árvore rubro-negra
 typedef struct ArvoreRN ArvoreRN;
 typedef void (*func_destruir)(void *elemento);
+typedef void (*func_destruir_elemento)(void *elemento);
 
 // Construtor e destrutor
 ArvoreRN *arvore_rn_criar();
 void arvore_rn_destruir(ArvoreRN *arvore, func_destruir destruir_elemento);
 
 // Operações principais
-void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *dado);
+void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *dado, func_destruir destruir_elemento);
 void *arvore_rn_buscar(ArvoreRN *arvore, char *chave);
 
 // Função para debug

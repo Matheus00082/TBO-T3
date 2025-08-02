@@ -21,7 +21,7 @@ TabelaHash *criar_tabela_hash(int tamanho, func_hash hash, func_destruir destrui
     nova_tabela->qtd_elementos = 0;
     nova_tabela->hash = hash;
     nova_tabela->destruir_elemento = destruir_elemento;
-    nova_tabela->tabela = calloc(tamanho, sizeof(Node *));
+    nova_tabela->tabela = calloc(tamanho, sizeof(ArvoreRN *));
 
     if (nova_tabela->tabela == NULL) {
         printf("Erro ao alocar memória para a tabela.\n");
@@ -58,7 +58,7 @@ void inserir_elemento(TabelaHash *tabela, void *chave, void *valor) {
         return;
     }
 
-    arvore_rn_inserir(tabela->tabela[indice], chave, valor);
+    arvore_rn_inserir(tabela->tabela[indice], chave, valor, tabela->destruir_elemento);
     tabela->qtd_elementos++;
 }
 
@@ -84,11 +84,24 @@ void destruir_tabela_hash(TabelaHash *tabela) {
         for (int i = 0; i < tabela->tamanho; i++) {
             if (tabela->tabela[i] != NULL) {
                 arvore_rn_destruir(tabela->tabela[i], tabela->destruir_elemento);
-                tabela->tabela[i] = NULL;
             }
         }
 
         free(tabela->tabela);
         free(tabela);
+    }
+}
+
+void imprimir_tabela_hash(TabelaHash *tabela) {
+    if (tabela == NULL) {
+        printf("Tabela ou função de impressão inválida.\n");
+        return;
+    }
+
+    for (int i = 0; i < tabela->tamanho; i++) {
+        ArvoreRN *arvore = tabela->tabela[i];
+        if (arvore != NULL) {
+            arvore_rn_imprimir(arvore);
+        }
     }
 }

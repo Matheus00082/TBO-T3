@@ -87,14 +87,20 @@ void destruir_auxiliar(Auxiliar *a) {
     }
 }
 
+int cmp_arquivos_vector(const void *a, const void *b) {
+    const char *str_a = (const char *)a;
+    const char *str_b = (const char *)b;
+    return strcmp(str_a, str_b);
+}
+
 TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
     int qtd_linhas = obter_qtd_linhas(a);
     char **linhas = obter_linhas(a);
     TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, destruir_pagina);
 
     for (int i = 0; i < qtd_linhas; i++) {
-        char *nome_pagina = strdup(linhas[i]);
-        Pagina *pagina = criar_pagina(nome_pagina, qtd_linhas);
+        char *nome_pagina = linhas[i];
+        Pagina *pagina = criar_pagina(strdup(nome_pagina), qtd_linhas);
         inserir_elemento(tabela, nome_pagina, pagina);
     }
 
@@ -108,8 +114,8 @@ TabelaHash *cria_tabela_stop_words(func_hash hash) {
     TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, free);
 
     for (int i = 0; i < qtd_linhas; i++) {
-        char *palavra = strdup(linhas[i]);
-        inserir_elemento(tabela, palavra, palavra);
+        char *palavra = linhas[i];
+        inserir_elemento(tabela, palavra, strdup(palavra));
     }
 
     destruir_auxiliar(aux);
@@ -120,11 +126,11 @@ TabelaHash *cria_tabela_stop_words(func_hash hash) {
 TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash hash) {
     int qtd_arquivos = obter_qtd_linhas(a);
     char **nome_arquivos = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, vector_destroy);
+    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, vector_destroy_func);
 
     for (int i = 0; i < qtd_arquivos; i++) {
         char caminho_arquivo[256];
-        char *nome_arquivo = strdup(nome_arquivos[i]);
+        char *nome_arquivo = nome_arquivos[i];
         snprintf(caminho_arquivo, sizeof(caminho_arquivo), "exemplo/pages/%s", nome_arquivo);
         FILE *arquivo = fopen(caminho_arquivo, "r");
 
@@ -146,13 +152,12 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash 
 
                     if (v == NULL) {
                         v = vector_construct(free);
-                        vector_push_back(v, nome_arquivo);
-                        char *palavra_copia = strdup(palavra);
-                        inserir_elemento(tabela, palavra_copia, v);
+                        vector_push_back(v, strdup(nome_arquivo));
+                        inserir_elemento(tabela, palavra, v);
                     }
                     else {
-                        if (vector_find(v, nome_arquivo, strcmp) == -1) {
-                            vector_push_back(v, nome_arquivo);
+                        if (vector_find(v, nome_arquivo, cmp_arquivos_vector) == -1) {
+                            vector_push_back(v, strdup(nome_arquivo)); 
                         }
                     }
                 }
@@ -165,5 +170,5 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash 
         fclose(arquivo);
     }
     
-    return NULL;
+    return tabela;
 }

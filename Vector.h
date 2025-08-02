@@ -44,6 +44,6 @@ void vector_sort(Vector *v, compare c);
 int vector_binary_search(Vector *v, data_type val, compare c);
 
 // Libera a memoria alocada para o vetor
-void vector_destroy(Vector *v);
+void vector_destroy_func(void *v);
 
 #endif
