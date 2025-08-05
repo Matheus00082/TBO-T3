@@ -4,6 +4,9 @@
 struct Auxiliar {
     char **linhas;
     int qtd_linhas;
+    TabelaHash *stop_words;
+    TabelaHash *tabela_palavras;
+    TabelaHash *tabela_arquivos;
 };
 
 Auxiliar *ler_arquivo(const char *nomeArquivo) {
@@ -81,22 +84,18 @@ void destruir_auxiliar(Auxiliar *a) {
                 free(a->linhas[i]);
             }
         }
-
+        destruir_tabela_hash(a->tabela_arquivos);
+        destruir_tabela_hash(a->stop_words);
+        destruir_tabela_hash(a->tabela_palavras);
         free(a->linhas);
         free(a);
     }
 }
 
-int cmp_arquivos_vector(const void *a, const void *b) {
-    const char *str_a = (const char *)a;
-    const char *str_b = (const char *)b;
-    return strcasecmp(str_a, str_b);
-}
-
-TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
+void cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
     int qtd_linhas = obter_qtd_linhas(a);
     char **linhas = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, destruir_pagina);
+    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, NULL);
 
     for (int i = 0; i < qtd_linhas; i++) {
         char *nome_pagina = linhas[i];
@@ -104,10 +103,10 @@ TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
         inserir_elemento(tabela, nome_pagina, pagina);
     }
 
-    return tabela;
+    a->tabela_arquivos = tabela;
 }
 
-TabelaHash *cria_tabela_stop_words(func_hash hash) {
+void cria_tabela_stop_words(Auxiliar *a, func_hash hash) {
     Auxiliar *aux = ler_arquivo("exemplo/stopwords.txt");
     int qtd_linhas = obter_qtd_linhas(aux);
     char **linhas = obter_linhas(aux);
@@ -119,11 +118,11 @@ TabelaHash *cria_tabela_stop_words(func_hash hash) {
     }
 
     destruir_auxiliar(aux);
-    return tabela;
+    a->stop_words = tabela;
 }
 
 // Abre e lê cada arquivo e insere as palavras na tabela hash
-TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash hash) {
+void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
     int qtd_arquivos = obter_qtd_linhas(a);
     char **nome_arquivos = obter_linhas(a);
     TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, vector_destroy_func);
@@ -143,25 +142,25 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash 
         size_t tamanho_buffer = 0;
 
         while (getline(&buffer, &tamanho_buffer, arquivo) != -1) {
-            // buffer[strcspn(buffer, "\n")] = 0;     // Remove newline character
-            char *palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulações ou quebras de linha
+            char *string_palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulações ou quebras de linha
 
-            while (palavra != NULL) {
-                if (buscar_elemento(stop_words, palavra) == NULL) {
-                    Vector *v = (Vector *)buscar_elemento(tabela, palavra);
+            while (string_palavra != NULL) {
+                if (buscar_elemento(a->stop_words, string_palavra) == NULL) {
+                    Palavra *p = (Palavra *)buscar_elemento(tabela, string_palavra);
+                    Pagina *pag = buscar_elemento(a->tabela_arquivos, nome_arquivo);
 
-                    if (v == NULL) {
-                        v = vector_construct(free);
-                        vector_push_back(v, strdup(nome_arquivo));
-                        inserir_elemento(tabela, palavra, v);
+                    if (p == NULL) {
+                        p = palavra_construtor(string_palavra);
+                        adiciona_arquivo_palavra(p, pag);
+                        inserir_elemento(tabela, string_palavra, p);
                     }
                     else {
-                        if (vector_find(v, nome_arquivo, cmp_arquivos_vector) == -1) {
-                            vector_push_back(v, strdup(nome_arquivo)); 
+                        if (busca_arquivo_palavra(p, pag) == -1) {
+                            adiciona_arquivo_palavra(p, pag);
                         }
                     }
                 }
-                palavra = strtok(NULL, " \t\n");
+                string_palavra = strtok(NULL, " \t\n");
             }
         }
 
@@ -169,5 +168,5 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash 
         fclose(arquivo);
     }
     
-    return tabela;
+    a->tabela_palavras = tabela;
 }

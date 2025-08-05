@@ -25,9 +25,9 @@ unsigned long hash(TabelaHash *tabela, void *chave) {
 int main(int argc, char const *argv[]) {
     // 3.1 Indexador
     Auxiliar *aux = ler_arquivo("exemplo/index.txt");
-    TabelaHash *tabela_de_arquivos = cria_tabela_arquivos(aux, hash);
-    TabelaHash *stop_words = cria_tabela_stop_words(hash);
-    TabelaHash *tabela_de_palavras = cria_tabela_palavras(aux, stop_words, hash);
+    cria_tabela_arquivos(aux, hash);
+    cria_tabela_stop_words(aux, hash);
+    cria_tabela_palavras(aux, hash);
     char *buffer = NULL;
     size_t tamanho_buffer = 0;
     FILE *arquivo = fopen("exemplo/searches.txt", "r");
@@ -49,8 +49,5 @@ int main(int argc, char const *argv[]) {
     free(buffer);
     fclose(arquivo);
     destruir_auxiliar(aux);
-    destruir_tabela_hash(tabela_de_arquivos);
-    destruir_tabela_hash(stop_words);
-    destruir_tabela_hash(tabela_de_palavras);
     return 0;
 }

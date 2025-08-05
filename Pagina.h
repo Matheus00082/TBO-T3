@@ -15,6 +15,8 @@ Pagina *criar_pagina(char *nome, double num_paginas);
 // @ Retorna o nome da página
 char *obter_nome_pagina(Pagina *p);
 
+int compara_pagina(const void *a, const void *b);
+
 // @ Destrói uma página
 void destruir_pagina(void *dado);
 

@@ -28,6 +28,12 @@ char *obter_nome_pagina(Pagina *p) {
     return p->nome;
 }
 
+int compara_pagina(const void *a, const void *b){
+    const Pagina *pag_a = (const Pagina *)a;
+    const Pagina *pag_b = (const Pagina *)b;
+    return strcasecmp(pag_a->nome, pag_b->nome);
+}
+
 void destruir_pagina(void *dado) {
     Pagina *a = (Pagina *)dado;
 

@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "Pagina.h"
+#include "Palavra.h"
 #include "TabelaHash.h"
 
 #define CAPACIDADE_INICIAL 50
@@ -26,12 +27,12 @@ int obter_qtd_linhas(Auxiliar *a);
 void destruir_auxiliar(Auxiliar *a);
 
 // @ Cria uma tabela hash a partir de um arquivo
-TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash);
+void cria_tabela_arquivos(Auxiliar *a, func_hash hash);
 
 // @ Cria uma tabela hash para stop words
-TabelaHash *cria_tabela_stop_words(func_hash hash);
+void cria_tabela_stop_words(Auxiliar *a, func_hash hash);
 
 // @ Cria uma tabela hash a partir das palavras presentes nos arquivos
-TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words ,func_hash hash);
+void cria_tabela_palavras(Auxiliar *a, func_hash hash);
 
 #endif
