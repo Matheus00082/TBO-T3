@@ -84,9 +84,18 @@ void destruir_auxiliar(Auxiliar *a) {
                 free(a->linhas[i]);
             }
         }
-        destruir_tabela_hash(a->tabela_arquivos);
-        destruir_tabela_hash(a->stop_words);
-        destruir_tabela_hash(a->tabela_palavras);
+        if (a->stop_words != NULL) {
+            destruir_tabela_hash(a->stop_words);
+        }
+
+        if (a->tabela_palavras != NULL) {
+            destruir_tabela_hash(a->tabela_palavras);
+        }
+
+        if (a->tabela_arquivos != NULL) {
+            destruir_tabela_hash(a->tabela_arquivos);
+        }
+        
         free(a->linhas);
         free(a);
     }
@@ -95,7 +104,7 @@ void destruir_auxiliar(Auxiliar *a) {
 void cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
     int qtd_linhas = obter_qtd_linhas(a);
     char **linhas = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, NULL);
+    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, destruir_pagina);
 
     for (int i = 0; i < qtd_linhas; i++) {
         char *nome_pagina = linhas[i];
@@ -125,7 +134,7 @@ void cria_tabela_stop_words(Auxiliar *a, func_hash hash) {
 void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
     int qtd_arquivos = obter_qtd_linhas(a);
     char **nome_arquivos = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, vector_destroy_func);
+    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, palavra_destrutor);
 
     for (int i = 0; i < qtd_arquivos; i++) {
         char caminho_arquivo[256];
@@ -164,8 +173,8 @@ void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
             }
         }
 
-        free(buffer);
-        fclose(arquivo);
+        if (buffer != NULL) free(buffer);
+        if (arquivo != NULL) fclose(arquivo);
     }
     
     a->tabela_palavras = tabela;

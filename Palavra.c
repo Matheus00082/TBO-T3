@@ -14,7 +14,7 @@ int cmp_arquivos_vector(const void *a, const void *b) {
 Palavra* palavra_construtor(char* palavra) {
     Palavra *p = (Palavra*)calloc(1, sizeof(Palavra));
     p->palavra = palavra;
-    p->arquivos = vector_construct(destruir_pagina);
+    p->arquivos = vector_construct(NULL);
     return p;
 }
 
@@ -28,8 +28,7 @@ int busca_arquivo_palavra(Palavra* p, Pagina* pag) {
 
 void palavra_destrutor(void* p) {
     Palavra *palavra = (Palavra*)p;
-
     vector_destroy_func(palavra->arquivos);
-    free(palavra->palavra);
+    //free(palavra->palavra); Unica e exclusivamente se a palavra for duplicada na criação
     free(palavra);
 }

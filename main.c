@@ -41,10 +41,10 @@ int main(int argc, char const *argv[]) {
     }
 
     // 3.3 Processador de Consultas
-    while(getline(&buffer, &tamanho_buffer, arquivo) != -1) {
-        buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
-        printf("Linha lida: %s\n", buffer);
-    }
+    // while(getline(&buffer, &tamanho_buffer, arquivo) != -1) {
+    //     buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
+    //     printf("Linha lida: %s\n", buffer);
+    // }
 
     free(buffer);
     fclose(arquivo);
