@@ -23,6 +23,7 @@ unsigned long hash(TabelaHash *tabela, void *chave) {
 }
 
 int main(int argc, char const *argv[]) {
+    // 3.1 Indexador
     Auxiliar *aux = ler_arquivo("exemplo/index.txt");
     TabelaHash *tabela_de_arquivos = cria_tabela_arquivos(aux, hash);
     TabelaHash *stop_words = cria_tabela_stop_words(hash);
@@ -31,11 +32,15 @@ int main(int argc, char const *argv[]) {
     size_t tamanho_buffer = 0;
     FILE *arquivo = fopen("exemplo/searches.txt", "r");
 
+    // 3.2 Google's PageRank
+
+
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
 
+    // 3.3 Processador de Consultas
     while(getline(&buffer, &tamanho_buffer, arquivo) != -1) {
         buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
         printf("Linha lida: %s\n", buffer);

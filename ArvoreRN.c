@@ -90,8 +90,8 @@ int eh_preto(NodeRN *node) {
 }
 
 NodeRN *buscar_node(NodeRN *node, char *chave) {
-    while (node != NULL && strcmp(chave, node->chave) != 0) {
-        if (strcmp(chave, node->chave) < 0) {
+    while (node != NULL && strcasecmp(chave, node->chave) != 0) {
+        if (strcasecmp(chave, node->chave) < 0) {
             node = node->esquerda;
         } 
         else {
@@ -139,7 +139,7 @@ NodeRN *inserir_node(NodeRN *x, char *chave, void *valor, func_destruir destruir
         return criar_node_rn(chave, valor);
     }
 
-    int cmp = strcmp(chave, x->chave);
+    int cmp = strcasecmp(chave, x->chave);
 
     if (cmp < 0) {
         x->esquerda = inserir_node(x->esquerda, chave, valor, destruir_elemento);

@@ -32,7 +32,7 @@ int conecta_node(Node *node1, Node *node2) {
     node1->num_nodes_arvore++;
 
     // se a chave do no1 for maior que a do no2, conecta no lado direito
-    int cmp = strcmp(node1->chave, node2->chave);
+    int cmp = strcasecmp(node1->chave, node2->chave);
 
     if (cmp > 0) {
         if (node1->direita == NULL) {

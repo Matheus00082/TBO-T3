@@ -90,7 +90,7 @@ void destruir_auxiliar(Auxiliar *a) {
 int cmp_arquivos_vector(const void *a, const void *b) {
     const char *str_a = (const char *)a;
     const char *str_b = (const char *)b;
-    return strcmp(str_a, str_b);
+    return strcasecmp(str_a, str_b);
 }
 
 TabelaHash *cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
@@ -161,7 +161,6 @@ TabelaHash *cria_tabela_palavras(Auxiliar *a, TabelaHash *stop_words, func_hash 
                         }
                     }
                 }
-
                 palavra = strtok(NULL, " \t\n");
             }
         }
