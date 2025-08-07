@@ -18,14 +18,16 @@ Palavra* palavra_construtor(char* palavra) {
     return p;
 }
 
-void adiciona_arquivo_palavra(Palavra* p, Pagina* pag) {
+void palavra_adiciona_arquivo(Palavra* p, Pagina* pag) {
     vector_push_back(p->arquivos, pag);
 }
 
-int busca_arquivo_palavra(Palavra* p, Pagina* pag) {
-    return vector_find(p->arquivos, pag, compara_pagina);
+int palavra_busca_arquivo(Palavra* p, Pagina* pag) {
+    return vector_find(p->arquivos, pag, cmp_arquivos_vector);
 }
-
+Vector* palavra_retorna_arquivos(Palavra* p){
+    return p->arquivos;
+}
 void palavra_destrutor(void* p) {
     Palavra *palavra = (Palavra*)p;
     vector_destroy_func(palavra->arquivos);

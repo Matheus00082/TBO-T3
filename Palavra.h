@@ -6,9 +6,14 @@
 
 typedef struct Palavra Palavra;
 
+// construtor e destrutor
 Palavra* palavra_construtor(char* palavra);
-void adiciona_arquivo_palavra(Palavra* p, Pagina* pag);
-int busca_arquivo_palavra(Palavra* p, Pagina* pag);
 void palavra_destrutor(void* p);
+
+// auxiliares
+void palavra_adiciona_arquivo(Palavra* p, Pagina* pag);
+int palavra_busca_arquivo(Palavra* p, Pagina* pag);
+Vector* palavra_retorna_arquivos(Palavra* p);
+
 
 #endif

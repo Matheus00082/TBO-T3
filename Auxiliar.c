@@ -4,9 +4,9 @@
 struct Auxiliar {
     char **linhas;
     int qtd_linhas;
-    TabelaHash *stop_words;
-    TabelaHash *tabela_palavras;
-    TabelaHash *tabela_arquivos;
+    ArvoreRN *stop_words;
+    ArvoreRN *tabela_palavras;
+    ArvoreRN *tabela_arquivos;
 };
 
 Auxiliar *ler_arquivo(const char *nomeArquivo) {
@@ -85,15 +85,15 @@ void destruir_auxiliar(Auxiliar *a) {
             }
         }
         if (a->stop_words != NULL) {
-            destruir_tabela_hash(a->stop_words);
+            arvore_rn_destruir(a->stop_words, free);
         }
 
         if (a->tabela_palavras != NULL) {
-            destruir_tabela_hash(a->tabela_palavras);
+            arvore_rn_destruir(a->tabela_palavras, palavra_destrutor);
         }
 
         if (a->tabela_arquivos != NULL) {
-            destruir_tabela_hash(a->tabela_arquivos);
+            arvore_rn_destruir(a->tabela_arquivos, pagina_destrutor);
         }
         
         free(a->linhas);
@@ -104,29 +104,31 @@ void destruir_auxiliar(Auxiliar *a) {
 void cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
     int qtd_linhas = obter_qtd_linhas(a);
     char **linhas = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, destruir_pagina);
+    ArvoreRN *tabela = arvore_rn_criar();
 
     for (int i = 0; i < qtd_linhas; i++) {
         char *nome_pagina = linhas[i];
-        Pagina *pagina = criar_pagina(strdup(nome_pagina), qtd_linhas);
-        inserir_elemento(tabela, nome_pagina, pagina);
+        Pagina *pagina = pagina_construtor(strdup(nome_pagina), qtd_linhas);
+        arvore_rn_inserir(tabela, nome_pagina, pagina, pagina_destrutor);
     }
 
     a->tabela_arquivos = tabela;
 }
 
 void cria_tabela_stop_words(Auxiliar *a, func_hash hash) {
-    Auxiliar *aux = ler_arquivo("exemplo/stopwords.txt");
-    int qtd_linhas = obter_qtd_linhas(aux);
-    char **linhas = obter_linhas(aux);
-    TabelaHash *tabela = criar_tabela_hash(qtd_linhas, hash, free);
-
-    for (int i = 0; i < qtd_linhas; i++) {
-        char *palavra = linhas[i];
-        inserir_elemento(tabela, palavra, strdup(palavra));
+    FILE* arquivo_stop_words = fopen("exemplo/stopwords.txt", "r");
+    ArvoreRN *tabela = arvore_rn_criar();
+    char *buffer = NULL;
+    size_t tamanho_linha = 0;
+    while (getline(&buffer, &tamanho_linha, arquivo_stop_words) != -1) {
+        buffer[strcspn(buffer, "\n")] = 0;
+        arvore_rn_inserir(tabela, buffer, strdup(buffer), free);
     }
-
-    destruir_auxiliar(aux);
+    fclose(arquivo_stop_words);
+    if (buffer != NULL) {
+        free(buffer);
+    }
+    
     a->stop_words = tabela;
 }
 
@@ -134,7 +136,7 @@ void cria_tabela_stop_words(Auxiliar *a, func_hash hash) {
 void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
     int qtd_arquivos = obter_qtd_linhas(a);
     char **nome_arquivos = obter_linhas(a);
-    TabelaHash *tabela = criar_tabela_hash(qtd_arquivos, hash, palavra_destrutor);
+    ArvoreRN *tabela = arvore_rn_criar();
 
     for (int i = 0; i < qtd_arquivos; i++) {
         char caminho_arquivo[256];
@@ -154,18 +156,18 @@ void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
             char *string_palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulações ou quebras de linha
 
             while (string_palavra != NULL) {
-                if (buscar_elemento(a->stop_words, string_palavra) == NULL) {
-                    Palavra *p = (Palavra *)buscar_elemento(tabela, string_palavra);
-                    Pagina *pag = buscar_elemento(a->tabela_arquivos, nome_arquivo);
+                if (arvore_rn_buscar(a->stop_words, string_palavra) == NULL) {
+                    Palavra *p = (Palavra *)arvore_rn_buscar(tabela, string_palavra);
+                    Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_arquivo);
 
                     if (p == NULL) {
                         p = palavra_construtor(string_palavra);
-                        adiciona_arquivo_palavra(p, pag);
-                        inserir_elemento(tabela, string_palavra, p);
+                        palavra_adiciona_arquivo(p, pag);
+                        arvore_rn_inserir(tabela, string_palavra, p, palavra_destrutor);
                     }
                     else {
-                        if (busca_arquivo_palavra(p, pag) == -1) {
-                            adiciona_arquivo_palavra(p, pag);
+                        if (palavra_busca_arquivo(p, pag) == -1) {
+                            palavra_adiciona_arquivo(p, pag);
                         }
                     }
                 }
@@ -178,4 +180,38 @@ void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
     }
     
     a->tabela_palavras = tabela;
+}
+
+
+void realiza_busca_palavras(Auxiliar* a, const char* palavra){
+    // pega na arvoreRN de palavras a palavra ( se existir)
+    // seria algo do tipo:
+    // printf("search:%s\n", palavra);
+    // verificar se tem mais de uma palavra e dp buscar na RN: 
+    // Palavra* palavras = (Palavra*)arvore_rn_buscar(a->tabela_palavras, palavra); (caso so tenha 1 seria assim)
+    // calcula o page rank de CADA palavra
+    // printa os arquivos e o page rank
+    //for(int i = 0; i < num_palavra_busca; i++){
+    //      if(i == 0){
+    //          printf("pages:");  
+    //      }      
+    //      Vector* arquivos = retorna_arquivos_palavra(palavras[i]);
+    //      for(int i = 0; i < vector_size(arquivos); i++){
+    //          Pagina* p = vector_get(arquivos, i);
+    //              printf("%s ", obter_nome_pagina(p));          
+    //      }
+    //          
+    //      
+    //}
+    // printf("\n");
+    //for(int i = 0; i < num_palavra_busca; i++){
+    //      if(i == 0){
+    //          printf("pr:");  
+    //      }      
+    //      if(pg_rank[i] != 0){
+    //          printf("%f ",pg_rank[i]);
+    //      }
+    //}
+    //
+
 }

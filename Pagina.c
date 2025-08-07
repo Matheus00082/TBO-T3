@@ -9,7 +9,7 @@ struct Pagina {
     int *links_entrada;
 };
 
-Pagina *criar_pagina(char *nome, double num_paginas) {
+Pagina *pagina_construtor(char *nome, double num_paginas) {
     Pagina *nova_pagina = (Pagina *)malloc(sizeof(Pagina));
 
     if (nova_pagina == NULL) {
@@ -24,17 +24,17 @@ Pagina *criar_pagina(char *nome, double num_paginas) {
     return nova_pagina;
 }
 
-char *obter_nome_pagina(Pagina *p) {
+char *pagina_obter_nome(Pagina *p) {
     return p->nome;
 }
 
-int compara_pagina(const void *a, const void *b){
+int pagina_compara(const void *a, const void *b){
     const Pagina *pag_a = (const Pagina *)a;
     const Pagina *pag_b = (const Pagina *)b;
     return strcasecmp(pag_a->nome, pag_b->nome);
 }
 
-void destruir_pagina(void *dado) {
+void pagina_destrutor(void *dado) {
     Pagina *a = (Pagina *)dado;
 
     if (a != NULL) {

@@ -8,6 +8,7 @@
 #include "Pagina.h"
 #include "Palavra.h"
 #include "TabelaHash.h"
+#include "ArvoreRN.h"
 
 #define CAPACIDADE_INICIAL 50
 
@@ -34,5 +35,8 @@ void cria_tabela_stop_words(Auxiliar *a, func_hash hash);
 
 // @ Cria uma tabela hash a partir das palavras presentes nos arquivos
 void cria_tabela_palavras(Auxiliar *a, func_hash hash);
+
+// @ Busca nas tabelas a palavra e imprime na tela os arquivos que ela aparece e o pageRank 
+void realiza_busca_palavras(Auxiliar* a, const char* palavra);
 
 #endif

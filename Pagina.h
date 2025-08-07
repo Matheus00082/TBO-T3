@@ -10,14 +10,14 @@
 typedef struct Pagina Pagina;
 
 // @ Cria uma nova página
-Pagina *criar_pagina(char *nome, double num_paginas);
+Pagina *pagina_construtor(char *nome, double num_paginas);
 
 // @ Retorna o nome da página
-char *obter_nome_pagina(Pagina *p);
+char *pagina_obter_nome(Pagina *p);
 
-int compara_pagina(const void *a, const void *b);
+int pagina_compara(const void *a, const void *b);
 
 // @ Destrói uma página
-void destruir_pagina(void *dado);
+void pagina_destrutor(void *dado);
 
 #endif
