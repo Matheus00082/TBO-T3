@@ -3,7 +3,7 @@
 
 struct Auxiliar {
     char **linhas;
-    int qtd_linhas;
+    int qtd_paginas;
     ArvoreRN *stop_words;
     ArvoreRN *tabela_palavras;
     ArvoreRN *tabela_arquivos;
@@ -39,7 +39,7 @@ Auxiliar *ler_arquivo(const char *nomeArquivo) {
     while (getline(&buffer, &tamanho_linha, arquivo) != -1) {
         buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
 
-        if (aux->qtd_linhas >= capacidade) {
+        if (aux->qtd_paginas >= capacidade) {
             capacidade *= 2;
             aux->linhas = realloc(aux->linhas, capacidade * sizeof(char *));
 
@@ -50,15 +50,15 @@ Auxiliar *ler_arquivo(const char *nomeArquivo) {
             }
         }
 
-        aux->linhas[aux->qtd_linhas] = strdup(buffer);
+        aux->linhas[aux->qtd_paginas] = strdup(buffer);
 
-        if (aux->linhas[aux->qtd_linhas] == NULL) {
+        if (aux->linhas[aux->qtd_paginas] == NULL) {
             printf("Erro ao duplicar a linha.\n");
             fclose(arquivo);
             return NULL;
         }
 
-        aux->qtd_linhas++;
+        aux->qtd_paginas++;
     }
 
     if (buffer != NULL) {
@@ -73,13 +73,13 @@ char **obter_linhas(Auxiliar *a) {
     return a->linhas;
 }
 
-int obter_qtd_linhas(Auxiliar *a) {
-    return a->qtd_linhas;
+int obter_qtd_paginas(Auxiliar *a) {
+    return a->qtd_paginas;
 }
 
 void destruir_auxiliar(Auxiliar *a) {
     if (a != NULL) {
-        for (int i = 0; i < a->qtd_linhas; i++) {
+        for (int i = 0; i < a->qtd_paginas; i++) {
             if (a->linhas[i] != NULL) {
                 free(a->linhas[i]);
             }
@@ -182,8 +182,11 @@ void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
     a->tabela_palavras = tabela;
 }
 
+void le_arquivo_graph(Auxiliar* a) {
+    
+}
 
-void realiza_busca_palavras(Auxiliar* a, const char* palavra){
+void realiza_busca_palavras(Auxiliar* a, const char* palavra) {
     // pega na arvoreRN de palavras a palavra ( se existir)
     // seria algo do tipo:
     // printf("search:%s\n", palavra);

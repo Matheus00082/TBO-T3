@@ -17,6 +17,9 @@ char *pagina_obter_nome(Pagina *p);
 
 int pagina_compara(const void *a, const void *b);
 
+void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2);
+void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2);
+
 // @ Destrói uma página
 void pagina_destrutor(void *dado);
 

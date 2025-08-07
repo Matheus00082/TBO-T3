@@ -5,8 +5,8 @@ struct Pagina {
     double page_rank;
     int qtd_links_entrada;
     int qtd_links_saida;
-    int *links_saida;
-    int *links_entrada;
+    Pagina** links_saida;
+    Pagina** links_entrada;
 };
 
 Pagina *pagina_construtor(char *nome, double num_paginas) {
@@ -32,6 +32,16 @@ int pagina_compara(const void *a, const void *b){
     const Pagina *pag_a = (const Pagina *)a;
     const Pagina *pag_b = (const Pagina *)b;
     return strcasecmp(pag_a->nome, pag_b->nome);
+}
+
+void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
+    pagina1->links_entrada = pagina2;
+    pagina1->qtd_links_entrada++;
+}
+
+void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){
+    pagina1->links_saida = pagina2;
+    pagina1->qtd_links_saida++;
 }
 
 void pagina_destrutor(void *dado) {
