@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define ALFA 0.85
+#define CAPACIDADE_ENTRADA_INICIAL 10
 
 typedef struct Pagina Pagina;
 
@@ -17,7 +18,10 @@ char *pagina_obter_nome(Pagina *p);
 
 int pagina_compara(const void *a, const void *b);
 
+void aloca_lista_links_saida(Pagina* pagina, int qtd);
+
 void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2);
+
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2);
 
 // @ Destrói uma página

@@ -25,15 +25,16 @@ unsigned long hash(TabelaHash *tabela, void *chave) {
 int main(int argc, char const *argv[]) {
     // 3.1 Indexador
     Auxiliar *aux = ler_arquivo("exemplo/index.txt");
-    cria_tabela_arquivos(aux, hash);
-    cria_tabela_stop_words(aux, hash);
-    cria_tabela_palavras(aux, hash);
+    cria_arquivos(aux, hash);
+    cria_stop_words(aux, hash);
+    cria_palavras(aux, hash);
     char *buffer = NULL;
     size_t tamanho_buffer = 0;
-    FILE *arquivo = fopen("exemplo/searches.txt", "r");
 
     // 3.2 Google's PageRank
+    inicializa_arquivos("exemplo/graph.txt", aux);
 
+    FILE *arquivo = fopen("exemplo/searches.txt", "r");
 
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");

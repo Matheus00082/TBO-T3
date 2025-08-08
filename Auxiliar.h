@@ -28,15 +28,17 @@ int obter_qtd_linhas(Auxiliar *a);
 void destruir_auxiliar(Auxiliar *a);
 
 // @ Cria uma tabela hash a partir de um arquivo
-void cria_tabela_arquivos(Auxiliar *a, func_hash hash);
+void cria_arquivos(Auxiliar *a, func_hash hash);
 
 // @ Cria uma tabela hash para stop words
-void cria_tabela_stop_words(Auxiliar *a, func_hash hash);
+void cria_stop_words(Auxiliar *a, func_hash hash);
 
 // @ Cria uma tabela hash a partir das palavras presentes nos arquivos
-void cria_tabela_palavras(Auxiliar *a, func_hash hash);
+void cria_palavras(Auxiliar *a, func_hash hash);
 
-// @ Busca nas tabelas a palavra e imprime na tela os arquivos que ela aparece e o pageRank 
+void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a);
+
+// @ Busca nas tabelas a palavra e imprime na tela os arquivos que ela aparece e o pageRank
 void realiza_busca_palavras(Auxiliar* a, const char* palavra);
 
 #endif

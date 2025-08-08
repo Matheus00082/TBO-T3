@@ -101,8 +101,8 @@ void destruir_auxiliar(Auxiliar *a) {
     }
 }
 
-void cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
-    int qtd_linhas = obter_qtd_linhas(a);
+void cria_arquivos(Auxiliar *a, func_hash hash) {
+    int qtd_linhas = a->qtd_paginas;
     char **linhas = obter_linhas(a);
     ArvoreRN *tabela = arvore_rn_criar();
 
@@ -115,7 +115,7 @@ void cria_tabela_arquivos(Auxiliar *a, func_hash hash) {
     a->tabela_arquivos = tabela;
 }
 
-void cria_tabela_stop_words(Auxiliar *a, func_hash hash) {
+void cria_stop_words(Auxiliar *a, func_hash hash) {
     FILE* arquivo_stop_words = fopen("exemplo/stopwords.txt", "r");
     ArvoreRN *tabela = arvore_rn_criar();
     char *buffer = NULL;
@@ -133,8 +133,8 @@ void cria_tabela_stop_words(Auxiliar *a, func_hash hash) {
 }
 
 // Abre e lê cada arquivo e insere as palavras na tabela hash
-void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
-    int qtd_arquivos = obter_qtd_linhas(a);
+void cria_palavras(Auxiliar *a, func_hash hash) {
+    int qtd_arquivos = a->qtd_paginas;
     char **nome_arquivos = obter_linhas(a);
     ArvoreRN *tabela = arvore_rn_criar();
 
@@ -182,8 +182,44 @@ void cria_tabela_palavras(Auxiliar *a, func_hash hash) {
     a->tabela_palavras = tabela;
 }
 
-void le_arquivo_graph(Auxiliar* a) {
-    
+void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo: %s\n", nomeArquivo);
+        return;
+    }
+
+    char *buffer = NULL;
+    size_t tamanho_linha = 0;
+
+    while (getline(&buffer, &tamanho_linha, arquivo) != -1) {
+        buffer[strcspn(buffer, "\n")] = 0;
+        char *nome_pagina = strtok(buffer, " ");
+        Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_pagina);
+
+        int qtd_links_saida = atoi(strtok(NULL, " "));
+        aloca_lista_links_saida(pag, qtd_links_saida);
+
+        for (int i = 0; i < qtd_links_saida; i++) {
+            char *nome_link_saida = strtok(NULL, " ");
+            Pagina *pag_saida = arvore_rn_buscar(a->tabela_arquivos, nome_link_saida);
+
+            if (pag_saida == NULL) {
+                continue;
+            }
+
+            pagina_adiciona_link_saida(pag, pag_saida);
+            pagina_adiciona_link_entrada(pag_saida, pag);
+        }
+    }
+
+    if (buffer != NULL) {
+        free(buffer);
+    }
+
+    if (arquivo != NULL) {
+        fclose(arquivo);
+    }
 }
 
 void realiza_busca_palavras(Auxiliar* a, const char* palavra) {
