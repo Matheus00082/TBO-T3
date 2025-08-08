@@ -60,7 +60,7 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
 }
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){
-    pagina1->links_saida[pagina1->qtd_links_saida] = pagina2;
+    //pagina1->links_saida[pagina1->qtd_links_saida] = pagina2;
     pagina1->qtd_links_saida++;
 }
 

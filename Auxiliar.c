@@ -198,7 +198,7 @@ void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
         Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_pagina);
 
         int qtd_links_saida = atoi(strtok(NULL, " "));
-        aloca_lista_links_saida(pag, qtd_links_saida);
+        //aloca_lista_links_saida(pag, qtd_links_saida);
 
         for (int i = 0; i < qtd_links_saida; i++) {
             char *nome_link_saida = strtok(NULL, " ");
