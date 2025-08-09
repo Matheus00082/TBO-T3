@@ -237,25 +237,16 @@ void realiza_busca_palavras(Auxiliar* a, char* palavra) {
     // //          printf("pages:");  
     // //      }      
     Vector* arquivos = palavra_retorna_arquivos(palavras);
+    Pagina** paginas = calloc(vector_size(arquivos), sizeof(Pagina*));
+    printf("pages:");
     for(int i = 0; i < vector_size(arquivos); i++){
-        Pagina* p = vector_get(arquivos, i);
-        printf("%s ", pagina_obter_nome(p));
-        pagina_calcula_pgrank_total(p, a->qtd_paginas);
+        paginas[i] = vector_get(arquivos, i);
+        printf("%s ", pagina_obter_nome(paginas[i]));
         
     }
+    pagina_calcula_pgrank_total(paginas, vector_size(arquivos),a->qtd_paginas);
+    free(paginas);
+    printf("\n");
     
-    //          
-    //      
-    //}
-    // printf("\n");
-    //for(int i = 0; i < num_palavra_busca; i++){
-    //      if(i == 0){
-    //          printf("pr:");  
-    //      }      
-    //      if(pg_rank[i] != 0){
-    //          printf("%f ",pg_rank[i]);
-    //      }
-    //}
-    //
 
 }

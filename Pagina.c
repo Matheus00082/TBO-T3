@@ -60,16 +60,18 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
 }
 
 double pagina_calcula_pgrank(Pagina* pagina, int k, int total_pag) {
-    if (k == 0)
-        return 1.0 / total_pag;
+    
+    if (k == 0) return 1.0 / (double)total_pag;
 
     double base = (1.0 - ALFA) / (double) total_pag;
 
     // soma das contribuições das páginas que apontam para essa
-    double soma_in = 0;
+    double soma_in = 0.0;
     for (int j = 0; j < pagina->qtd_links_entrada; j++) {
         Pagina* origem = pagina->links_entrada[j];
-        soma_in += pagina_calcula_pgrank(origem, k - 1, total_pag) / (double) origem->qtd_links_saida;
+        if (origem->qtd_links_saida > 0) {
+            soma_in += pagina_calcula_pgrank(origem, k - 1, total_pag) / (double)origem->qtd_links_saida;
+        }
     }
 
     if (pagina->qtd_links_saida == 0) {
@@ -80,19 +82,24 @@ double pagina_calcula_pgrank(Pagina* pagina, int k, int total_pag) {
     }
 }
 
+void pagina_calcula_pgrank_total(Pagina** paginas, int qtd_paginas, int total_pag) {
+    double erro = EPSILON + 1;
+    int k = 1;
 
-void pagina_calcula_pgrank_total(Pagina* pagina, int total_pags){
-    double page_rank_antes = 0;
-    for(int k = 1; k < total_pags; k++){
-        double page_rank_atual = pagina_calcula_pgrank(pagina, k, total_pags);
-        if((k != 1) && (fabs(page_rank_antes - page_rank_atual) < 1e-7)){
-            pagina->page_rank = page_rank_atual;
-            break;
+    while (erro >= EPSILON) {
+        erro = 0;
+        for (int i = 0; i < qtd_paginas; i++) {
+            double novo = pagina_calcula_pgrank(paginas[i], k, total_pag);
+            erro += fabs(novo - paginas[i]->page_rank);
+            paginas[i]->page_rank = novo;
         }
-        page_rank_antes = page_rank_atual;
+        erro /= total_pag;
+        k++;
     }
-    printf("%lf", pagina->page_rank);
-
+    for(int i = 0; i < qtd_paginas; i++){
+        if(paginas[i]->page_rank)
+            printf("%.16lf ", paginas[i]->page_rank);
+    }
 }
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){

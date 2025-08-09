@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define ALFA 0.85
+#define EPSILON 1e-6
 #define CAPACIDADE_ENTRADA_INICIAL 10
 
 typedef struct Pagina Pagina;
@@ -24,7 +25,7 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2);
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2);
 
-void pagina_calcula_pgrank_total(Pagina* pagina, int total_pags);
+void pagina_calcula_pgrank_total(Pagina** paginas, int qtd_paginas,int total_pags);
 
 // @ Destrói uma página
 void pagina_destrutor(void *dado);
