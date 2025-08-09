@@ -40,7 +40,8 @@ int main(int argc, char const *argv[]) {
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
-
+    //rocked
+    realiza_busca_palavras(aux, "rocked");
     // 3.3 Processador de Consultas
     // while(getline(&buffer, &tamanho_buffer, arquivo) != -1) {
     //     buffer[strcspn(buffer, "\n")] = 0; // Remove newline character

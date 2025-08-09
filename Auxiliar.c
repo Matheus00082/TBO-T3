@@ -222,23 +222,28 @@ void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
     }
 }
 
-void realiza_busca_palavras(Auxiliar* a, const char* palavra) {
+void realiza_busca_palavras(Auxiliar* a, char* palavra) {
+    
+    
     // pega na arvoreRN de palavras a palavra ( se existir)
     // seria algo do tipo:
-    // printf("search:%s\n", palavra);
+    printf("search:%s\n", palavra);
     // verificar se tem mais de uma palavra e dp buscar na RN: 
-    // Palavra* palavras = (Palavra*)arvore_rn_buscar(a->tabela_palavras, palavra); (caso so tenha 1 seria assim)
-    // calcula o page rank de CADA palavra
-    // printa os arquivos e o page rank
-    //for(int i = 0; i < num_palavra_busca; i++){
-    //      if(i == 0){
-    //          printf("pages:");  
-    //      }      
-    //      Vector* arquivos = retorna_arquivos_palavra(palavras[i]);
-    //      for(int i = 0; i < vector_size(arquivos); i++){
-    //          Pagina* p = vector_get(arquivos, i);
-    //              printf("%s ", obter_nome_pagina(p));          
-    //      }
+    Palavra* palavras = (Palavra*)arvore_rn_buscar(a->tabela_palavras, palavra);
+    // // calcula o page rank de CADA palavra
+    // // printa os arquivos e o page rank
+    // //for(int i = 0; i < num_palavra_busca; i++){
+    // //      if(i == 0){
+    // //          printf("pages:");  
+    // //      }      
+    Vector* arquivos = palavra_retorna_arquivos(palavras);
+    for(int i = 0; i < vector_size(arquivos); i++){
+        Pagina* p = vector_get(arquivos, i);
+        printf("%s ", pagina_obter_nome(p));
+        pagina_calcula_pgrank_total(p, a->qtd_paginas);
+        
+    }
+    
     //          
     //      
     //}

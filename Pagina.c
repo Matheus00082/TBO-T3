@@ -1,5 +1,5 @@
 #include "Pagina.h"
-
+#include <math.h>
 struct Pagina {
     char *nome;
     double page_rank;
@@ -57,6 +57,42 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
 
     pagina1->links_entrada[pagina1->qtd_links_entrada] = pagina2;
     pagina1->qtd_links_entrada++;
+}
+
+double pagina_calcula_pgrank(Pagina* pagina, int k, int total_pag) {
+    if (k == 0)
+        return 1.0 / total_pag;
+
+    double base = (1.0 - ALFA) / (double) total_pag;
+
+    // soma das contribuições das páginas que apontam para essa
+    double soma_in = 0;
+    for (int j = 0; j < pagina->qtd_links_entrada; j++) {
+        Pagina* origem = pagina->links_entrada[j];
+        soma_in += pagina_calcula_pgrank(origem, k - 1, total_pag) / (double) origem->qtd_links_saida;
+    }
+
+    if (pagina->qtd_links_saida == 0) {
+        return base + ALFA * (pagina_calcula_pgrank(pagina, k - 1, total_pag) + soma_in);
+    } else {
+        // caso normal
+        return base + ALFA * soma_in;
+    }
+}
+
+
+void pagina_calcula_pgrank_total(Pagina* pagina, int total_pags){
+    double page_rank_antes = 0;
+    for(int k = 1; k < total_pags; k++){
+        double page_rank_atual = pagina_calcula_pgrank(pagina, k, total_pags);
+        if((k != 1) && (fabs(page_rank_antes - page_rank_atual) < 1e-7)){
+            pagina->page_rank = page_rank_atual;
+            break;
+        }
+        page_rank_antes = page_rank_atual;
+    }
+    printf("%lf", pagina->page_rank);
+
 }
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){

@@ -39,6 +39,6 @@ void cria_palavras(Auxiliar *a, func_hash hash);
 void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a);
 
 // @ Busca nas tabelas a palavra e imprime na tela os arquivos que ela aparece e o pageRank
-void realiza_busca_palavras(Auxiliar* a, const char* palavra);
+void realiza_busca_palavras(Auxiliar* a, char* palavra);
 
 #endif

@@ -24,6 +24,8 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2);
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2);
 
+void pagina_calcula_pgrank_total(Pagina* pagina, int total_pags);
+
 // @ Destrói uma página
 void pagina_destrutor(void *dado);
 
