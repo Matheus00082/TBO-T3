@@ -94,6 +94,10 @@ void pagina_calcula_pgrank_total(Pagina** paginas, int qtd_paginas, int total_pa
             paginas[i]->page_rank = novo;
         }
         
+        if (qtd_paginas == 0) {
+            continue; 
+        }
+
         erro /= qtd_paginas;
         k++;
     }
