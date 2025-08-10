@@ -85,7 +85,7 @@ data_type vector_set(Vector *v, int i, data_type val) {
 // Retorna o índice da primeira ocorrência do item no Vector ou -1 se o elemento não for encontrado.
 int vector_find(Vector *v, data_type val, compare c) {
     for (int i = 0; i < v->size; i++) {
-        if (c(val, vector_get(v, i))) {
+        if (c(val, vector_get(v, i)) == 0) {
             return i;
         }
     }
@@ -166,4 +166,10 @@ int vector_binary_search(Vector *v, data_type val, compare c) {
     }
 
     return -1;
+}
+
+void vector_copy(Vector *v1, Vector *v2) {
+    for (int i = 0; i < v2->size; i++) {
+        vector_push_back(v1, v2->data[i]);
+    }
 }

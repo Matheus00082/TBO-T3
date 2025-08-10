@@ -43,6 +43,9 @@ void vector_sort(Vector *v, compare c);
 // Retorna o indice de val usando busca binaria. Retorna -1 se nao encontrado.
 int vector_binary_search(Vector *v, data_type val, compare c);
 
+// Copia os elementos do vetor v2 para o vetor v1
+void vector_copy(Vector *v1, Vector *v2);
+
 // Libera a memoria alocada para o vetor
 void vector_destroy_func(void *v);
 

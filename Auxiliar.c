@@ -101,7 +101,7 @@ void destruir_auxiliar(Auxiliar *a) {
     }
 }
 
-void cria_arquivos(Auxiliar *a, func_hash hash) {
+void cria_arquivos(Auxiliar *a) {
     int qtd_linhas = a->qtd_paginas;
     char **linhas = obter_linhas(a);
     ArvoreRN *tabela = arvore_rn_criar();
@@ -115,16 +115,19 @@ void cria_arquivos(Auxiliar *a, func_hash hash) {
     a->tabela_arquivos = tabela;
 }
 
-void cria_stop_words(Auxiliar *a, func_hash hash) {
-    FILE* arquivo_stop_words = fopen("exemplo/stopwords.txt", "r");
+void cria_stop_words(Auxiliar *a) {
+    FILE *arquivo_stop_words = fopen("exemplo/stopwords.txt", "r");
     ArvoreRN *tabela = arvore_rn_criar();
     char *buffer = NULL;
     size_t tamanho_linha = 0;
+
     while (getline(&buffer, &tamanho_linha, arquivo_stop_words) != -1) {
         buffer[strcspn(buffer, "\n")] = 0;
         arvore_rn_inserir(tabela, buffer, strdup(buffer), free);
     }
+
     fclose(arquivo_stop_words);
+
     if (buffer != NULL) {
         free(buffer);
     }
@@ -132,8 +135,7 @@ void cria_stop_words(Auxiliar *a, func_hash hash) {
     a->stop_words = tabela;
 }
 
-// Abre e lê cada arquivo e insere as palavras na tabela hash
-void cria_palavras(Auxiliar *a, func_hash hash) {
+void cria_palavras(Auxiliar *a) {
     int qtd_arquivos = a->qtd_paginas;
     char **nome_arquivos = obter_linhas(a);
     ArvoreRN *tabela = arvore_rn_criar();
@@ -171,6 +173,7 @@ void cria_palavras(Auxiliar *a, func_hash hash) {
                         }
                     }
                 }
+
                 string_palavra = strtok(NULL, " \t\n");
             }
         }
@@ -184,6 +187,7 @@ void cria_palavras(Auxiliar *a, func_hash hash) {
 
 void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
     FILE *arquivo = fopen(nomeArquivo, "r");
+
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo: %s\n", nomeArquivo);
         return;
@@ -222,31 +226,52 @@ void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
     }
 }
 
-void realiza_busca_palavras(Auxiliar* a, char* palavra) {
-    
-    
-    // pega na arvoreRN de palavras a palavra ( se existir)
-    // seria algo do tipo:
-    printf("search:%s\n", palavra);
-    // verificar se tem mais de uma palavra e dp buscar na RN: 
-    Palavra* palavras = (Palavra*)arvore_rn_buscar(a->tabela_palavras, palavra);
-    // // calcula o page rank de CADA palavra
-    // // printa os arquivos e o page rank
-    // //for(int i = 0; i < num_palavra_busca; i++){
-    // //      if(i == 0){
-    // //          printf("pages:");  
-    // //      }      
-    Vector* arquivos = palavra_retorna_arquivos(palavras);
-    Pagina** paginas = calloc(vector_size(arquivos), sizeof(Pagina*));
-    printf("pages:");
-    for(int i = 0; i < vector_size(arquivos); i++){
-        paginas[i] = vector_get(arquivos, i);
-        printf("%s ", pagina_obter_nome(paginas[i]));
-        
-    }
-    pagina_calcula_pgrank_total(paginas, vector_size(arquivos),a->qtd_paginas);
-    free(paginas);
-    printf("\n");
-    
+void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
+    printf("search:%s\n", search_palavras);
+    char *palavra = strtok(search_palavras, " ");
+    Vector *palavras = vector_construct(NULL);
 
+    while (palavra != NULL) {
+        Palavra *p = (Palavra *)arvore_rn_buscar(a->tabela_palavras, palavra);
+        
+        if (p == NULL) {
+            // Palavra não encontrada - interseção será vazia
+            vector_destroy_func(palavras);
+            Vector *vazio = vector_construct(NULL);
+            printf("pages:\n");
+            printf("pr:\n");
+            return;
+        }
+        
+        vector_push_back(palavras, p);
+        palavra = strtok(NULL, " ");
+    }
+
+    Vector* arquivos =  palavra_retorna_arquivos_intersecao(palavras);
+    int qtd_arquivos = vector_size(arquivos);
+    Pagina** paginas = calloc(qtd_arquivos, sizeof(Pagina*));
+    printf("pages:");
+
+    for (int i = 0; i < qtd_arquivos; i++) {
+        paginas[i] = vector_get(arquivos, i);
+        printf("%s", pagina_obter_nome(paginas[i]));
+
+        if (i < qtd_arquivos - 1) {
+            printf(" ");
+        }
+        else {
+            printf("\n");
+        }
+    }
+
+    if (qtd_arquivos == 0) {
+        printf("\n");
+    }
+
+    printf("pr:");
+    pagina_calcula_pgrank_total(paginas, qtd_arquivos, a->qtd_paginas);
+    printf("\n");
+    vector_destroy_func(palavras);
+    vector_destroy_func(arquivos);
+    free(paginas);
 }

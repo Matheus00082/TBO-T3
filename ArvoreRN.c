@@ -99,6 +99,10 @@ NodeRN *buscar_node(NodeRN *node, char *chave) {
         }
     }
 
+    if (node == NULL) {
+        return NULL;
+    }
+
     return node;
 }
 

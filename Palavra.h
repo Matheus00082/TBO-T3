@@ -14,6 +14,8 @@ void palavra_destrutor(void* p);
 void palavra_adiciona_arquivo(Palavra* p, Pagina* pag);
 int palavra_busca_arquivo(Palavra* p, Pagina* pag);
 Vector* palavra_retorna_arquivos(Palavra* p);
+Vector *palavra_retorna_arquivos_intersecao(Vector *palavras);
 
+char *palavra_obter_nome(Palavra *p);
 
 #endif

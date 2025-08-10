@@ -1,5 +1,6 @@
 #include "Pagina.h"
 #include <math.h>
+
 struct Pagina {
     char *nome;
     double page_rank;
@@ -60,26 +61,24 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
 }
 
 double pagina_calcula_pgrank(Pagina* pagina, int k, int total_pag) {
-    
-    if (k == 0) return 1.0 / (double)total_pag;
+    if (k == 0) {
+        return 1.0 / (double)total_pag;
+    }
 
     double base = (1.0 - ALFA) / (double) total_pag;
 
     // soma das contribuições das páginas que apontam para essa
     double soma_in = 0.0;
+
     for (int j = 0; j < pagina->qtd_links_entrada; j++) {
         Pagina* origem = pagina->links_entrada[j];
+
         if (origem->qtd_links_saida > 0) {
             soma_in += pagina_calcula_pgrank(origem, k - 1, total_pag) / (double)origem->qtd_links_saida;
         }
     }
 
-    if (pagina->qtd_links_saida == 0) {
-        return base + ALFA * (pagina_calcula_pgrank(pagina, k - 1, total_pag) + soma_in);
-    } else {
-        // caso normal
-        return base + ALFA * soma_in;
-    }
+    return base + (ALFA * soma_in);
 }
 
 void pagina_calcula_pgrank_total(Pagina** paginas, int qtd_paginas, int total_pag) {
@@ -88,17 +87,21 @@ void pagina_calcula_pgrank_total(Pagina** paginas, int qtd_paginas, int total_pa
 
     while (erro >= EPSILON) {
         erro = 0;
+    
         for (int i = 0; i < qtd_paginas; i++) {
             double novo = pagina_calcula_pgrank(paginas[i], k, total_pag);
             erro += fabs(novo - paginas[i]->page_rank);
             paginas[i]->page_rank = novo;
         }
-        erro /= total_pag;
+        
+        erro /= qtd_paginas;
         k++;
     }
-    for(int i = 0; i < qtd_paginas; i++){
-        if(paginas[i]->page_rank)
+
+    for (int i = 0; i < qtd_paginas; i++) {
+        if (paginas[i]->page_rank) {
             printf("%.16lf ", paginas[i]->page_rank);
+        }
     }
 }
 
