@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "Pagina.h"
 #include "Palavra.h"
@@ -96,6 +97,17 @@ void cria_palavras(Auxiliar *a);
  * o valor PageRank para cada página, armazenando na estrutura correspondente.
  */
 void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a);
+
+/**
+ * @brief Calcula o PageRank global de todas as páginas na rede
+ * @param a Ponteiro para a estrutura Auxiliar contendo todas as páginas
+ * @return void
+ * 
+ * Executa o algoritmo Power Method para calcular o PageRank de todas as páginas
+ * na rede, considerando os links entre elas. Deve ser chamado após a inicialização
+ * dos links e antes de qualquer busca.
+ */
+void calcula_pagerank_global(Auxiliar* a);
 
 /**
  * @brief Realiza busca por uma palavra e exibe resultados ordenados por PageRank

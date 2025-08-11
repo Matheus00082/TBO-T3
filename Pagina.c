@@ -34,6 +34,29 @@ char *pagina_obter_nome(Pagina *p) {
     return p->nome;
 }
 
+double pagina_obter_pagerank(Pagina *p) {
+    return p->page_rank;
+}
+
+void pagina_definir_pagerank(Pagina *p, double pagerank) {
+    p->page_rank = pagerank;
+}
+
+int pagina_obter_qtd_links_entrada(Pagina *p) {
+    return p->qtd_links_entrada;
+}
+
+Pagina* pagina_obter_link_entrada(Pagina *p, int index) {
+    if (index >= 0 && index < p->qtd_links_entrada) {
+        return p->links_entrada[index];
+    }
+    return NULL;
+}
+
+int pagina_obter_qtd_links_saida(Pagina *p) {
+    return p->qtd_links_saida;
+}
+
 int pagina_compara(const void *a, const void *b){
     const Pagina *pag_a = (const Pagina *)a;
     const Pagina *pag_b = (const Pagina *)b;
@@ -58,55 +81,6 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
 
     pagina1->links_entrada[pagina1->qtd_links_entrada] = pagina2;
     pagina1->qtd_links_entrada++;
-}
-
-double pagina_calcula_pgrank(Pagina* pagina, int k, int total_pag) {
-    if (k == 0) {
-        return 1.0 / (double)total_pag;
-    }
-
-    double base = (1.0 - ALFA) / (double) total_pag;
-
-    // soma das contribuições das páginas que apontam para essa
-    double soma_in = 0.0;
-
-    for (int j = 0; j < pagina->qtd_links_entrada; j++) {
-        Pagina* origem = pagina->links_entrada[j];
-
-        if (origem->qtd_links_saida > 0) {
-            soma_in += pagina_calcula_pgrank(origem, k - 1, total_pag) / (double)origem->qtd_links_saida;
-        }
-    }
-
-    return base + (ALFA * soma_in);
-}
-
-void pagina_calcula_pgrank_total(Pagina** paginas, int qtd_paginas, int total_pag) {
-    double erro = EPSILON + 1;
-    int k = 1;
-
-    while (erro >= EPSILON) {
-        erro = 0;
-    
-        for (int i = 0; i < qtd_paginas; i++) {
-            double novo = pagina_calcula_pgrank(paginas[i], k, total_pag);
-            erro += fabs(novo - paginas[i]->page_rank);
-            paginas[i]->page_rank = novo;
-        }
-        
-        if (qtd_paginas == 0) {
-            continue; 
-        }
-
-        erro /= qtd_paginas;
-        k++;
-    }
-
-    for (int i = 0; i < qtd_paginas; i++) {
-        if (paginas[i]->page_rank) {
-            printf("%.16lf ", paginas[i]->page_rank);
-        }
-    }
 }
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){

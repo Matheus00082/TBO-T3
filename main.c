@@ -17,6 +17,8 @@ int main(int argc, char const *argv[]) {
 
     // 3.2 Google's PageRank
     inicializa_arquivos("exemplo/graph.txt", aux);
+    calcula_pagerank_global(aux); // Calcula PageRank global de todas as páginas
+    
     FILE *arquivo = fopen("exemplo/searches.txt", "r");
 
     if (arquivo == NULL) {

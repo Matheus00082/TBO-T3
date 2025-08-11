@@ -226,6 +226,61 @@ void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
     }
 }
 
+double calcula_pagerank_pagina(Pagina* pagina, int total_paginas) {
+    double base = (1.0 - ALFA) / (double)total_paginas;
+    double soma_in = 0.0;
+
+    int qtd_links_entrada = pagina_obter_qtd_links_entrada(pagina);
+
+    for (int j = 0; j < qtd_links_entrada; j++) {
+        Pagina* origem = pagina_obter_link_entrada(pagina, j);
+        int qtd_links_saida = pagina_obter_qtd_links_saida(origem);
+        
+        if (qtd_links_saida > 0) {
+            soma_in += pagina_obter_pagerank(origem) / (double)qtd_links_saida;
+        }
+    }
+    
+    return base + (ALFA * soma_in);
+}
+
+void calcula_pagerank_global(Auxiliar* a) {
+    int total_paginas = a->qtd_paginas;
+    char **nomes_paginas = obter_linhas(a);
+    
+    // Cria array com todas as páginas
+    Pagina** todas_paginas = calloc(total_paginas, sizeof(Pagina*));
+    
+    for (int i = 0; i < total_paginas; i++) {
+        todas_paginas[i] = arvore_rn_buscar(a->tabela_arquivos, nomes_paginas[i]);
+    }
+    
+    // Algoritmo do Power Method para calcular PageRank
+    double erro = EPSILON + 1;
+    
+    while (erro >= EPSILON) {
+        erro = 0;
+        // Calcula novos valores de PageRank para todas as páginas
+        double *novos_pageranks = calloc(total_paginas, sizeof(double));
+        
+        for (int i = 0; i < total_paginas; i++) {
+            novos_pageranks[i] = calcula_pagerank_pagina(todas_paginas[i], total_paginas);
+        }
+        
+        // Atualiza PageRanks e calcula erro
+        for (int i = 0; i < total_paginas; i++) {
+            double antigo = pagina_obter_pagerank(todas_paginas[i]);
+            pagina_definir_pagerank(todas_paginas[i], novos_pageranks[i]);
+            erro += fabs(novos_pageranks[i] - antigo);
+        }
+        
+        erro /= total_paginas;
+        free(novos_pageranks);
+    }
+    
+    free(todas_paginas);
+}
+
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
     printf("search:%s\n", search_palavras);
     char *palavra = strtok(search_palavras, " ");
@@ -241,6 +296,9 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
             printf("pages:\n");
             printf("pr:\n");
             return;
+        }
+        else if (arvore_rn_buscar(a->stop_words, palavra_obter_nome(p)) != NULL) {
+            continue; // Ignora stop words
         }
         
         vector_push_back(palavras, p);
@@ -269,7 +327,16 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
     }
 
     printf("pr:");
-    pagina_calcula_pgrank_total(paginas, qtd_arquivos, a->qtd_paginas);
+
+    for (int i = 0; i < qtd_arquivos; i++) {
+        double pagerank = pagina_obter_pagerank(paginas[i]);
+        printf("%.16lf", pagerank);
+
+        if (i < qtd_arquivos - 1) {
+            printf(" ");
+        }
+    }
+
     printf("\n");
     vector_destroy_func(palavras);
     vector_destroy_func(arquivos);
