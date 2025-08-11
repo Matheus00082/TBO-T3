@@ -287,18 +287,19 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
     Vector *palavras = vector_construct(NULL);
 
     while (palavra != NULL) {
+        if (arvore_rn_buscar(a->stop_words, palavra) != NULL) {
+            palavra = strtok(NULL, " ");
+            continue; // Ignora stop words
+        }
+
         Palavra *p = (Palavra *)arvore_rn_buscar(a->tabela_palavras, palavra);
-        
+
         if (p == NULL) {
             // Palavra não encontrada - interseção será vazia
             vector_destroy_func(palavras);
-            Vector *vazio = vector_construct(NULL);
             printf("pages:\n");
             printf("pr:\n");
             return;
-        }
-        else if (arvore_rn_buscar(a->stop_words, palavra_obter_nome(p)) != NULL) {
-            continue; // Ignora stop words
         }
         
         vector_push_back(palavras, p);
