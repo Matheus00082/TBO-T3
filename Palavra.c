@@ -1,4 +1,5 @@
 #include "Palavra.h"
+#include <string.h>
 
 struct Palavra {
     Vector *arquivos;
@@ -43,6 +44,12 @@ void palavra_destrutor(void* p) {
 
 char *palavra_obter_nome(Palavra *p) {
     return p->palavra;
+}
+
+int palavra_compara(const void *a, const void *b){
+    Palavra *pal_a = *(Palavra **)a;
+    Palavra *pal_b = *(Palavra **)b;
+    return strcasecmp(pal_a->palavra, pal_b->palavra);
 }
 
 Vector *intersecao_arquivos(Vector *v1, Vector *v2) {

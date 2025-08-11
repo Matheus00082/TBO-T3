@@ -202,7 +202,6 @@ void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
         Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_pagina);
 
         int qtd_links_saida = atoi(strtok(NULL, " "));
-        //aloca_lista_links_saida(pag, qtd_links_saida);
 
         for (int i = 0; i < qtd_links_saida; i++) {
             char *nome_link_saida = strtok(NULL, " ");
@@ -281,11 +280,17 @@ void calcula_pagerank_global(Auxiliar* a) {
     free(todas_paginas);
 }
 
+int compara_strings(const void *a, const void *b) {
+    const char * const *sa = a;  // ponteiro para elemento (char*)
+    const char * const *sb = b;
+    return strcasecmp(*sa, *sb); // ou strcmp se quiser case-sensitive
+}
+
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
-    printf("search:%s\n", search_palavras);
+   
     char *palavra = strtok(search_palavras, " ");
     Vector *palavras = vector_construct(NULL);
-
+    Vector* nome_palavras = vector_construct(NULL);
     while (palavra != NULL) {
         if (arvore_rn_buscar(a->stop_words, palavra) != NULL) {
             palavra = strtok(NULL, " ");
@@ -303,13 +308,23 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
         }
         
         vector_push_back(palavras, p);
+        vector_push_back(nome_palavras, palavra);
         palavra = strtok(NULL, " ");
     }
-
+    vector_sort(nome_palavras, compara_strings);
+    printf("search:");
+    for(int i = 0; i < vector_size(nome_palavras); i++){
+        printf("%s ", (char*)vector_get(nome_palavras, i));
+        if(vector_size(nome_palavras) - 1  == i){
+            printf("\n");
+        }
+    }
+    
     Vector* arquivos =  palavra_retorna_arquivos_intersecao(palavras);
     int qtd_arquivos = vector_size(arquivos);
     Pagina** paginas = calloc(qtd_arquivos, sizeof(Pagina*));
     printf("pages:");
+    double pagerank[qtd_arquivos];
 
     for (int i = 0; i < qtd_arquivos; i++) {
         paginas[i] = vector_get(arquivos, i);
@@ -340,6 +355,7 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
 
     printf("\n");
     vector_destroy_func(palavras);
+    vector_destroy_func(nome_palavras);
     vector_destroy_func(arquivos);
     free(paginas);
 }

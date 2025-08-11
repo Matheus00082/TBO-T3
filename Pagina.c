@@ -6,7 +6,6 @@ struct Pagina {
     double page_rank;
     int qtd_links_entrada;
     int qtd_links_saida;
-    Pagina** links_saida;
     Pagina** links_entrada;
     int capacidade_links_entrada;
 };
@@ -25,7 +24,6 @@ Pagina *pagina_construtor(char *nome, double num_paginas) {
     nova_pagina->links_entrada = (Pagina**)calloc(CAPACIDADE_ENTRADA_INICIAL, sizeof(Pagina*));
     nova_pagina->capacidade_links_entrada = CAPACIDADE_ENTRADA_INICIAL;
     nova_pagina->qtd_links_saida = 0;
-    nova_pagina->links_saida = NULL;
 
     return nova_pagina;
 }
@@ -63,11 +61,6 @@ int pagina_compara(const void *a, const void *b){
     return strcasecmp(pag_a->nome, pag_b->nome);
 }
 
-void aloca_lista_links_saida(Pagina* pagina, int qtd){
-    pagina->links_saida = (Pagina**) malloc(qtd * sizeof(Pagina*));
-    pagina->qtd_links_saida = 0;
-}
-
 void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
     if (pagina1->qtd_links_entrada >= pagina1->capacidade_links_entrada) {
         pagina1->capacidade_links_entrada *= 2;
@@ -84,7 +77,6 @@ void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
 }
 
 void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){
-    //pagina1->links_saida[pagina1->qtd_links_saida] = pagina2;
     pagina1->qtd_links_saida++;
 }
 
@@ -101,9 +93,6 @@ void pagina_destrutor(void *dado) {
             free(a->links_entrada);
         }
 
-        if (a->links_saida != NULL) {
-            free(a->links_saida);
-        }
 
         free(a);
     }
