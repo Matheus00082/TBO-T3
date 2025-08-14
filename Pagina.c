@@ -73,7 +73,8 @@ int compara_paginas_por_pagerank(const void *a, const void *b) {
     } else if (pagerank_a > pagerank_b) {
         return -1; // pag_a é maior
     }
-    return 0; // iguais
+    
+    return strcmp(pag_a->nome, pag_b->nome); // Se os PageRanks forem iguais, compara pelo nome
 }
 
 void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
