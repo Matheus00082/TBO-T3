@@ -10,12 +10,12 @@ int main(int argc, char const *argv[]) {
     // 3.1 Indexador
     char const *nome_arquivo = argv[1];
 
-    char caminho_arquivo[1000];
+    char caminho_arquivo[256];
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/index.txt", nome_arquivo);
     Auxiliar *aux = ler_arquivo(caminho_arquivo);
     cria_arquivos(aux);
-    cria_stop_words(aux);
-    cria_palavras(aux);
+    cria_stop_words(aux, nome_arquivo);
+    cria_palavras(aux, nome_arquivo);
     char *buffer = NULL;
     size_t tamanho_buffer = 0;
 

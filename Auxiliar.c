@@ -115,8 +115,12 @@ void cria_arquivos(Auxiliar *a) {
     a->tabela_arquivos = tabela;
 }
 
-void cria_stop_words(Auxiliar *a) {
-    FILE *arquivo_stop_words = fopen("exemplo/stopwords.txt", "r");
+void cria_stop_words(Auxiliar *a, char const *pasta) {
+
+    char caminho_arquivo[256];
+    snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/stopwords.txt", pasta);
+
+    FILE *arquivo_stop_words = fopen(caminho_arquivo, "r");
     ArvoreRN *tabela = arvore_rn_criar();
     char *buffer = NULL;
     size_t tamanho_linha = 0;
@@ -135,15 +139,18 @@ void cria_stop_words(Auxiliar *a) {
     a->stop_words = tabela;
 }
 
-void cria_palavras(Auxiliar *a) {
+void cria_palavras(Auxiliar *a, char const *pasta) {
     int qtd_arquivos = a->qtd_paginas;
     char **nome_arquivos = obter_linhas(a);
     ArvoreRN *tabela = arvore_rn_criar();
 
+    char caminho[256];
+    snprintf(caminho, sizeof(caminho), "%s/pages", pasta);
+
     for (int i = 0; i < qtd_arquivos; i++) {
-        char caminho_arquivo[256];
+        char caminho_arquivo[512];
         char *nome_arquivo = nome_arquivos[i];
-        snprintf(caminho_arquivo, sizeof(caminho_arquivo), "exemplo/pages/%s", nome_arquivo);
+        snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/%s", caminho, nome_arquivo);
         FILE *arquivo = fopen(caminho_arquivo, "r");
 
         if (arquivo == NULL) {
@@ -288,6 +295,7 @@ int compara_strings(const void *a, const void *b) {
 
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
    
+    printf("search: %s\n", search_palavras);
     char *palavra = strtok(search_palavras, " ");
     Vector *palavras = vector_construct(NULL);
     Vector* nome_palavras = vector_construct(NULL);
@@ -311,14 +319,14 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
         vector_push_back(nome_palavras, palavra);
         palavra = strtok(NULL, " ");
     }
-    vector_sort(nome_palavras, compara_strings);
-    printf("search:");
-    for(int i = 0; i < vector_size(nome_palavras); i++){
-        printf("%s ", (char*)vector_get(nome_palavras, i));
-        if(vector_size(nome_palavras) - 1  == i){
-            printf("\n");
-        }
-    }
+    // vector_sort(nome_palavras, compara_strings);
+    // printf("search:");
+    // for(int i = 0; i < vector_size(nome_palavras); i++){
+    //     printf("%s ", (char*)vector_get(nome_palavras, i));
+    //     if(vector_size(nome_palavras) - 1  == i){
+    //         printf("\n");
+    //     }
+    // }
     
     Vector* arquivos =  palavra_retorna_arquivos_intersecao(palavras);
     int qtd_arquivos = vector_size(arquivos);

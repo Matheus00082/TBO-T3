@@ -74,7 +74,7 @@ void cria_arquivos(Auxiliar *a);
  * Lê o arquivo de stop words e cria uma tabela hash para verificação
  * rápida de palavras que devem ser ignoradas durante a indexação.
  */
-void cria_stop_words(Auxiliar *a);
+void cria_stop_words(Auxiliar *a, char const *nome_arquivo);
 
 /**
  * @brief Cria e inicializa a tabela hash de palavras e seus arquivos correspondentes
@@ -85,7 +85,7 @@ void cria_stop_words(Auxiliar *a);
  * e criando um índice invertido onde cada palavra mapeia para uma lista
  * de arquivos que a contêm.
  */
-void cria_palavras(Auxiliar *a);
+void cria_palavras(Auxiliar *a, char const *nome_arquivo);
 
 /**
  * @brief Inicializa e calcula o PageRank dos arquivos baseado no grafo de links
