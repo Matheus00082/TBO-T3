@@ -73,7 +73,7 @@ Vector *intersecao_arquivos(Vector *v1, Vector *v2) {
 
             if (pagina_compara(pag_v1, pag_v2) == 0) {
                 vector_push_back(resultado, pag_v1);
-                break; 
+                break;
             }
         }
     }

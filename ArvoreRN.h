@@ -12,18 +12,9 @@ typedef enum {
     PRETO
 } Cor;
 
-// Estrutura do nó da árvore rubro-negra
-typedef struct NodeRN {
-    char *chave;
-    void *valor;
-    struct NodeRN *esquerda;
-    struct NodeRN *direita;
-   Cor cor;
-   int tamanho; // Número de nós na subárvore
-} NodeRN;
-
 // Estrutura da árvore rubro-negra
 typedef struct ArvoreRN ArvoreRN;
+typedef struct NodeRN NodeRN;
 typedef void (*func_destruir)(void *elemento);
 typedef void (*func_destruir_elemento)(void *elemento);
 
@@ -37,5 +28,7 @@ void *arvore_rn_buscar(ArvoreRN *arvore, char *chave);
 
 // Função para debug
 void arvore_rn_imprimir(ArvoreRN *arvore);
+
+void *get_valor(NodeRN *node);
 
 #endif

@@ -61,6 +61,21 @@ int pagina_compara(const void *a, const void *b){
     return strcasecmp(pag_a->nome, pag_b->nome);
 }
 
+int compara_paginas_por_pagerank(const void *a, const void *b) {
+    Pagina *pag_a = *(Pagina **)a;
+    Pagina *pag_b = *(Pagina **)b;
+
+    double pagerank_a = pagina_obter_pagerank(pag_a);
+    double pagerank_b = pagina_obter_pagerank(pag_b);
+
+    if (pagerank_a < pagerank_b) {
+        return 1; // pag_b é maior
+    } else if (pagerank_a > pagerank_b) {
+        return -1; // pag_a é maior
+    }
+    return 0; // iguais
+}
+
 void pagina_adiciona_link_entrada(Pagina* pagina1, Pagina* pagina2){
     if (pagina1->qtd_links_entrada >= pagina1->capacidade_links_entrada) {
         pagina1->capacidade_links_entrada *= 2;

@@ -44,4 +44,6 @@ void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2);
 // @ Destrói uma página
 void pagina_destrutor(void *dado);
 
+int compara_paginas_por_pagerank(const void *a, const void *b);
+
 #endif

@@ -294,11 +294,13 @@ int compara_strings(const void *a, const void *b) {
 }
 
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
-   
+
     printf("search: %s\n", search_palavras);
+
     char *palavra = strtok(search_palavras, " ");
-    Vector *palavras = vector_construct(NULL);
-    Vector* nome_palavras = vector_construct(NULL);
+    Vector *palavras = vector_construct(NULL); // para armazenar as palavras encontradas
+    Vector* nome_palavras = vector_construct(NULL); // para armazenar os nomes das palavras
+
     while (palavra != NULL) {
         if (arvore_rn_buscar(a->stop_words, palavra) != NULL) {
             palavra = strtok(NULL, " ");
@@ -319,16 +321,9 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
         vector_push_back(nome_palavras, palavra);
         palavra = strtok(NULL, " ");
     }
-    // vector_sort(nome_palavras, compara_strings);
-    // printf("search:");
-    // for(int i = 0; i < vector_size(nome_palavras); i++){
-    //     printf("%s ", (char*)vector_get(nome_palavras, i));
-    //     if(vector_size(nome_palavras) - 1  == i){
-    //         printf("\n");
-    //     }
-    // }
     
     Vector* arquivos =  palavra_retorna_arquivos_intersecao(palavras);
+    vector_sort(arquivos, compara_paginas_por_pagerank);
     int qtd_arquivos = vector_size(arquivos);
     Pagina** paginas = calloc(qtd_arquivos, sizeof(Pagina*));
     printf("pages:");

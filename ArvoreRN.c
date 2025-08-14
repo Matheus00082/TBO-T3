@@ -1,7 +1,17 @@
 #include "ArvoreRN.h"
 
+// Estrutura do nó da árvore rubro-negra
+struct NodeRN {
+    char *chave;
+    void *valor;
+    struct NodeRN *esquerda;
+    struct NodeRN *direita;
+   Cor cor;
+   int tamanho; // Número de nós na subárvore
+};
+
 struct ArvoreRN {
-    NodeRN *raiz;
+    struct NodeRN *raiz;
 };
 
 NodeRN *criar_node_rn(char *chave, void *valor) {
@@ -186,12 +196,7 @@ void *arvore_rn_buscar(ArvoreRN *arvore, char *chave) {
     }
 
     NodeRN *no = buscar_node(arvore->raiz, chave);
-    
-    if (no != NULL) {
-        return no->valor;
-    }
-    
-    return NULL;
+    return get_valor(no);
 }
 
 void arvore_rn_imprimir(ArvoreRN *arvore) {
@@ -207,4 +212,11 @@ void arvore_rn_imprimir(ArvoreRN *arvore) {
 
         printf("\n");
     }
+}
+
+void *get_valor(NodeRN *node) {
+    if (node != NULL) {
+        return node->valor;
+    }
+    return NULL;
 }
