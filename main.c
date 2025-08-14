@@ -8,7 +8,11 @@
 
 int main(int argc, char const *argv[]) {
     // 3.1 Indexador
-    Auxiliar *aux = ler_arquivo("exemplo/index.txt");
+    char const *nome_arquivo = argv[1];
+
+    char caminho_arquivo[1000];
+    snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/index.txt", nome_arquivo);
+    Auxiliar *aux = ler_arquivo(caminho_arquivo);
     cria_arquivos(aux);
     cria_stop_words(aux);
     cria_palavras(aux);
@@ -16,10 +20,14 @@ int main(int argc, char const *argv[]) {
     size_t tamanho_buffer = 0;
 
     // 3.2 Google's PageRank
-    inicializa_arquivos("exemplo/graph.txt", aux);
+    caminho_arquivo[0] = '\0'; // limpa o buffer
+    snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/graph.txt", nome_arquivo);
+    inicializa_arquivos(caminho_arquivo, aux);
     calcula_pagerank_global(aux); // Calcula PageRank global de todas as páginas
     
-    FILE *arquivo = fopen("exemplo/searches.txt", "r");
+    caminho_arquivo[0] = '\0'; // limpa o buffer
+    snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/searches.txt", nome_arquivo);
+    FILE *arquivo = fopen(caminho_arquivo, "r");
 
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
