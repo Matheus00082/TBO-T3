@@ -9,23 +9,21 @@
 int main(int argc, char const *argv[]) {
     // 3.1 Indexador
     char const *nome_arquivo = argv[1];
-
     char caminho_arquivo[256];
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/index.txt", nome_arquivo);
+    
     Auxiliar *aux = ler_arquivo(caminho_arquivo);
     cria_arquivos(aux);
     cria_stop_words(aux, nome_arquivo);
     cria_palavras(aux, nome_arquivo);
-    char *buffer = NULL;
-    size_t tamanho_buffer = 0;
 
     // 3.2 Google's PageRank
-    caminho_arquivo[0] = '\0'; // limpa o buffer
+    caminho_arquivo[0] = '\0';  // limpa o buffer
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/graph.txt", nome_arquivo);
     inicializa_arquivos(caminho_arquivo, aux);
-    calcula_pagerank_global(aux); // Calcula PageRank global de todas as páginas
+    calcula_pagerank_global(aux);   // Calcula PageRank global de todas as páginas
     
-    caminho_arquivo[0] = '\0'; // limpa o buffer
+    caminho_arquivo[0] = '\0';
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/searches.txt", nome_arquivo);
     FILE *arquivo = fopen(caminho_arquivo, "r");
 
@@ -35,8 +33,11 @@ int main(int argc, char const *argv[]) {
     }
     
     // 3.3 Processador de Consultas
+    char *buffer = NULL;
+    size_t tamanho_buffer = 0;
+
     while(getline(&buffer, &tamanho_buffer, arquivo) != -1) {
-        buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
+        buffer[strcspn(buffer, "\n")] = 0;  // Remove newline character
         realiza_busca_palavras(aux, buffer);
     }
 

@@ -93,8 +93,8 @@ void cria_palavras(Auxiliar *a, char const *nome_arquivo);
  * @param a Ponteiro para a estrutura Auxiliar contendo informações dos arquivos
  * @return void
  * 
- * Lê o arquivo de grafo que define as conexões entre páginas e calcula
- * o valor PageRank para cada página, armazenando na estrutura correspondente.
+ * Lê o arquivo de grafo que define as conexões entre páginas
+ * armazenando na estrutura correspondente.
  */
 void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a);
 

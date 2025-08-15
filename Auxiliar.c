@@ -37,7 +37,7 @@ Auxiliar *ler_arquivo(const char *nomeArquivo) {
     }
 
     while (getline(&buffer, &tamanho_linha, arquivo) != -1) {
-        buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
+        buffer[strcspn(buffer, "\n")] = 0;      // Remove newline character
 
         if (aux->qtd_paginas >= capacidade) {
             capacidade *= 2;
@@ -116,7 +116,6 @@ void cria_arquivos(Auxiliar *a) {
 }
 
 void cria_stop_words(Auxiliar *a, char const *pasta) {
-
     char caminho_arquivo[256];
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/stopwords.txt", pasta);
 
@@ -162,19 +161,19 @@ void cria_palavras(Auxiliar *a, char const *pasta) {
         size_t tamanho_buffer = 0;
 
         while (getline(&buffer, &tamanho_buffer, arquivo) != -1) {
-            char *string_palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulações ou quebras de linha
+            char *string_palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulacoes ou quebras de linha
 
             while (string_palavra != NULL) {
-                if (arvore_rn_buscar(a->stop_words, string_palavra) == NULL) {
+                if (arvore_rn_buscar(a->stop_words, string_palavra) == NULL) {  // Se a palavra nao eh stop word, ela eh adicionada na tabela de palavras 
                     Palavra *p = (Palavra *)arvore_rn_buscar(tabela, string_palavra);
                     Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_arquivo);
 
-                    if (p == NULL) {
+                    if (p == NULL) {    // Se a palavra ainda nao esta na tabela, adiciona com o arquivo em que se encontra
                         p = palavra_construtor(string_palavra);
                         palavra_adiciona_arquivo(p, pag);
                         arvore_rn_inserir(tabela, string_palavra, p, palavra_destrutor);
                     }
-                    else {
+                    else {      // Se a palavra ja esta na tabela, so precisa adicionar mais um arquivo em que ela se encontra
                         if (palavra_busca_arquivo(p, pag) == -1) {
                             palavra_adiciona_arquivo(p, pag);
                         }
@@ -294,12 +293,10 @@ int compara_strings(const void *a, const void *b) {
 }
 
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
-
     printf("search: %s\n", search_palavras);
 
     char *palavra = strtok(search_palavras, " ");
     Vector *palavras = vector_construct(NULL); // para armazenar as palavras encontradas
-    Vector* nome_palavras = vector_construct(NULL); // para armazenar os nomes das palavras
 
     while (palavra != NULL) {
         if (arvore_rn_buscar(a->stop_words, palavra) != NULL) {
@@ -318,7 +315,6 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
         }
         
         vector_push_back(palavras, p);
-        vector_push_back(nome_palavras, palavra);
         palavra = strtok(NULL, " ");
     }
     
@@ -358,7 +354,6 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
 
     printf("\n");
     vector_destroy_func(palavras);
-    vector_destroy_func(nome_palavras);
     vector_destroy_func(arquivos);
     free(paginas);
 }
