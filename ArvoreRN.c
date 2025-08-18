@@ -6,8 +6,8 @@ struct NodeRN {
     void *valor;
     struct NodeRN *esquerda;
     struct NodeRN *direita;
-   Cor cor;
-   int tamanho; // Número de nós na subárvore
+    Cor cor;
+    int tamanho; // Número de nós na subárvore
 };
 
 struct ArvoreRN {
