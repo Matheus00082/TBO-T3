@@ -111,7 +111,6 @@ void cria_arquivos(Auxiliar *a) {
         Pagina *pagina = pagina_construtor(strdup(nome_pagina), qtd_linhas);
         arvore_rn_inserir(tabela, nome_pagina, pagina, pagina_destrutor);
     }
-
     a->tabela_arquivos = tabela;
 }
 

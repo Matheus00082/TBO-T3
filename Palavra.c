@@ -57,30 +57,34 @@ Vector *intersecao_arquivos(Vector *v1, Vector *v2) {
     int size_v1 = vector_size(v1);
     int size_v2 = vector_size(v2);
 
-    // Se v1 está vazio, a interseção deve ser v2 (caso inicial)
     if (size_v1 == 0) {
         vector_copy(resultado, v2);
         vector_destroy_func(v1);
         return resultado;
     }
 
-    // Faz a interseção propriamente dita
+    // Cria um vetor de flags para v2
+    int *usado = calloc(size_v2, sizeof(int));
+
     for (int i = 0; i < size_v1; i++) {
         Pagina *pag_v1 = vector_get(v1, i);
-        
+
         for (int j = 0; j < size_v2; j++) {
             Pagina *pag_v2 = vector_get(v2, j);
 
-            if (pagina_compara(pag_v1, pag_v2) == 0) {
+            if (!usado[j] && pagina_compara(pag_v1, pag_v2) == 0) {
                 vector_push_back(resultado, pag_v1);
+                usado[j] = 1; // marca como usada
                 break;
             }
         }
     }
 
+    free(usado);
     vector_destroy_func(v1);
     return resultado;
 }
+
 
 Vector *palavra_retorna_arquivos_intersecao(Vector *palavras) {
     int qtd_palavras = vector_size(palavras);
