@@ -55,7 +55,7 @@ void destruir_node_rn(NodeRN *node, func_destruir destruir_elemento) {
     }
 }
 
-int get_tamanho(NodeRN *node) {
+int NodeRN_get_tamanho(NodeRN *node) {
     if (node == NULL) {
         return 0;
     }
@@ -70,7 +70,7 @@ NodeRN *rotacao_esquerda(NodeRN *x) {
     y->cor = x->cor;
     x->cor = VERMELHO; 
     y->tamanho = x->tamanho;
-    x->tamanho = 1 + get_tamanho(x->esquerda) + get_tamanho(x->direita);
+    x->tamanho = 1 + NodeRN_get_tamanho(x->esquerda) + NodeRN_get_tamanho(x->direita);
     return y;
 }
 
@@ -81,7 +81,7 @@ NodeRN *rotacao_direita(NodeRN *x) {
     y->cor = x->cor;
     x->cor = VERMELHO; 
     y->tamanho = x->tamanho;
-    x->tamanho = 1 + get_tamanho(x->esquerda) + get_tamanho(x->direita);
+    x->tamanho = 1 + NodeRN_get_tamanho(x->esquerda) + NodeRN_get_tamanho(x->direita);
     return y;
 }
 
@@ -181,7 +181,7 @@ NodeRN *inserir_node(NodeRN *x, char *chave, void *valor, func_destruir destruir
         mudar_cor(x);
     }
 
-    x->tamanho = get_tamanho(x->esquerda) + get_tamanho(x->direita) + 1;
+    x->tamanho = NodeRN_get_tamanho(x->esquerda) + NodeRN_get_tamanho(x->direita) + 1;
     return x;
 }
 
@@ -196,7 +196,7 @@ void *arvore_rn_buscar(ArvoreRN *arvore, char *chave) {
     }
 
     NodeRN *no = buscar_node(arvore->raiz, chave);
-    return get_valor(no);
+    return NodeRN_get_valor(no);
 }
 
 void arvore_rn_imprimir(ArvoreRN *arvore) {
@@ -214,7 +214,7 @@ void arvore_rn_imprimir(ArvoreRN *arvore) {
     }
 }
 
-void *get_valor(NodeRN *node) {
+void *NodeRN_get_valor(NodeRN *node) {
     if (node != NULL) {
         return node->valor;
     }

@@ -29,6 +29,6 @@ void *arvore_rn_buscar(ArvoreRN *arvore, char *chave);
 // Função para debug
 void arvore_rn_imprimir(ArvoreRN *arvore);
 
-void *get_valor(NodeRN *node);
+void *NodeRN_get_valor(NodeRN *node);
 
 #endif

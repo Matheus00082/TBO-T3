@@ -293,7 +293,7 @@ int compara_strings(const void *a, const void *b) {
 }
 
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
-    printf("search: %s\n", search_palavras);
+    printf("search:%s\n", search_palavras);
 
     char *palavra = strtok(search_palavras, " ");
     Vector *palavras = vector_construct(NULL); // para armazenar as palavras encontradas
@@ -345,7 +345,7 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
 
     for (int i = 0; i < qtd_arquivos; i++) {
         double pagerank = pagina_obter_pagerank(paginas[i]);
-        printf("%.16lf", pagerank);
+        printf("%lf", pagerank);
 
         if (i < qtd_arquivos - 1) {
             printf(" ");
