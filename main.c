@@ -25,15 +25,21 @@ int main(int argc, char const *argv[]) {
     inicializa_arquivos(caminho_arquivo, aux);
     calcula_pagerank_global(aux);   // Calcula PageRank global de todas as páginas
     
-    
     // 3.3 Processador de Consultas
-    char buffer[256];
+    char *buffer = NULL;
+    size_t tamanho_buffer = 0;
 
-    while(scanf("%[^\n]", buffer) == 1) {
+    while (getline(&buffer, &tamanho_buffer, stdin) != -1) {
+        buffer[strcspn(buffer, "\n")] = '\0'; // Remove newline character
+
+        if (buffer[0] == '\0') {
+            break; // Se a linha estiver vazia, sai do loop
+        }
+        
         realiza_busca_palavras(aux, buffer);
-        getchar();
     }
-    
+
+    free(buffer);
     destruir_auxiliar(aux);
     fim = clock();
     double tempo_total = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
