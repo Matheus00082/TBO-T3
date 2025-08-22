@@ -7,8 +7,6 @@
 #include "Pagina.h"
 
 int main(int argc, char const *argv[]) {
-    clock_t inicio, fim;
-    inicio = clock();
     
     // 3.1 Indexador
     char const *nome_arquivo = argv[1];
@@ -42,10 +40,6 @@ int main(int argc, char const *argv[]) {
 
     free(buffer);
     destruir_auxiliar(aux);
-
-    fim = clock();
-    double tempo_total = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-    printf("TEMPO TOTAL:%lf\n",tempo_total);
 
     return 0;
 }

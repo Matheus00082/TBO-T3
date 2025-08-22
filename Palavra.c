@@ -21,9 +21,6 @@ Palavra* palavra_construtor(char* palavra) {
 
 void palavra_adiciona_arquivo(Palavra* p, Pagina* pag) {
     if (palavra_busca_arquivo(p, pag) == -1) {
-        if(vector_size(p->arquivos)){
-            vector_sort(p->arquivos, pagina_compara);
-        }
         vector_push_back(p->arquivos, pag);
     }
 }
