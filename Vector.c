@@ -170,3 +170,15 @@ void vector_copy(Vector *v1, Vector *v2) {
         vector_push_back(v1, v2->data[i]);
     }
 }
+
+Vector *vector_clone(Vector *v) {
+    Vector *novo = vector_construct(NULL);
+    int size = vector_size(v);
+
+    for (int i = 0; i < size; i++) {
+        void *elem = vector_get(v, i);
+        vector_push_back(novo, elem);
+    }
+
+    return novo;
+}

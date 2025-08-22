@@ -21,6 +21,9 @@ Palavra* palavra_construtor(char* palavra) {
 
 void palavra_adiciona_arquivo(Palavra* p, Pagina* pag) {
     if (palavra_busca_arquivo(p, pag) == -1) {
+        if(vector_size(p->arquivos)){
+            vector_sort(p->arquivos, pagina_compara);
+        }
         vector_push_back(p->arquivos, pag);
     }
 }
@@ -71,13 +74,7 @@ Vector *intersecao_arquivos(Vector *v1, Vector *v2) {
     int size_v1 = vector_size(v1);
     int size_v2 = vector_size(v2);
 
-    if (size_v1 == 0) {
-        vector_copy(resultado, v2);
-        vector_destroy_func(v1);
-        return resultado;
-    }
-
-    // Cria um vetor de flags para v2
+    // Vetor de flags para marcar elementos já usados de v2
     int *usado = calloc(size_v2, sizeof(int));
 
     for (int i = 0; i < size_v1; i++) {
@@ -88,23 +85,27 @@ Vector *intersecao_arquivos(Vector *v1, Vector *v2) {
 
             if (!usado[j] && pagina_compara(pag_v1, pag_v2) == 0) {
                 vector_push_back(resultado, pag_v1);
-                usado[j] = 1; // marca como usada
+                usado[j] = 1;
                 break;
             }
         }
     }
 
     free(usado);
-    vector_destroy_func(v1);
+    vector_destroy_func(v1); // libera o anterior
     return resultado;
 }
 
-
 Vector *palavra_retorna_arquivos_intersecao(Vector *palavras) {
     int qtd_palavras = vector_size(palavras);
-    Vector *intersecao = vector_construct(NULL);
-    
-    for (int i = 0; i < qtd_palavras; i++) {
+    if (qtd_palavras == 0) return vector_construct(NULL);
+
+    // Começa com os arquivos da primeira palavra (faz uma cópia)
+    Palavra *primeira = vector_get(palavras, 0);
+    Vector *intersecao = vector_clone(primeira->arquivos);
+
+    // Agora vai refinando a interseção com as próximas
+    for (int i = 1; i < qtd_palavras; i++) {
         Palavra *p = vector_get(palavras, i);
         Vector *nova_intersecao = intersecao_arquivos(intersecao, p->arquivos);
         intersecao = nova_intersecao;

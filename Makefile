@@ -14,7 +14,7 @@ time:
 
 kb:
 	# memória máxima usada pelo processo em kb
-	/usr/bin/time -v ./trab3 ./exemplo
+	/usr/bin/time -v ./trab3 ./exemplo <exemplo/searches.txt >sol.txt
 
 teste 1:
 	./trab3 ./testes/1

@@ -46,6 +46,8 @@ int vector_binary_search(Vector *v, data_type val, compare c);
 // Copia os elementos do vetor v2 para o vetor v1
 void vector_copy(Vector *v1, Vector *v2);
 
+Vector *vector_clone(Vector *v);
+
 // Libera a memoria alocada para o vetor
 void vector_destroy_func(void *v);
 
