@@ -7,22 +7,19 @@
 #include "Pagina.h"
 
 int main(int argc, char const *argv[]) {
-    // 3.1 Indexador
     clock_t inicio, fim;
     inicio = clock();
+    
+    // 3.1 Indexador
     char const *nome_arquivo = argv[1];
     char caminho_arquivo[256];
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/index.txt", nome_arquivo);
     
     Auxiliar *aux = ler_arquivo(caminho_arquivo);
     cria_arquivos(aux);
-    fim = clock();
-    double tempo_total = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-    printf("TEMPO TOTAL:%lf\n",tempo_total );
     cria_stop_words(aux, nome_arquivo);
     cria_palavras(aux, nome_arquivo);
     
-
     // 3.2 Google's PageRank
     caminho_arquivo[0] = '\0';  // limpa o buffer
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/graph.txt", nome_arquivo);
@@ -45,5 +42,10 @@ int main(int argc, char const *argv[]) {
 
     free(buffer);
     destruir_auxiliar(aux);
+
+    fim = clock();
+    double tempo_total = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+    printf("TEMPO TOTAL:%lf\n",tempo_total);
+
     return 0;
 }

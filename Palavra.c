@@ -20,11 +20,25 @@ Palavra* palavra_construtor(char* palavra) {
 }
 
 void palavra_adiciona_arquivo(Palavra* p, Pagina* pag) {
-    vector_push_back(p->arquivos, pag);
+    if (palavra_busca_arquivo(p, pag) == -1) {
+        vector_push_back(p->arquivos, pag);
+    }
 }
 
 int palavra_busca_arquivo(Palavra* p, Pagina* pag) {
-    return vector_find(p->arquivos, pag, cmp_arquivos_vector);
+    int size = vector_size(p->arquivos);
+
+    if (size == 0) {
+        return -1; // Não encontrado
+    }
+    
+    Pagina *ultima_pagina_vector = vector_get(p->arquivos, size - 1);
+
+    if (pagina_compara(ultima_pagina_vector, pag) != 0) {
+        return -1; // Não encontrado
+    }
+
+    return 0;
 }
 
 Vector* palavra_retorna_arquivos(Palavra* p){

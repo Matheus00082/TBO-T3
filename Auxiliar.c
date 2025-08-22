@@ -173,9 +173,7 @@ void cria_palavras(Auxiliar *a, char const *pasta) {
                         arvore_rn_inserir(tabela, string_palavra, p, palavra_destrutor);
                     }
                     else {      // Se a palavra ja esta na tabela, so precisa adicionar mais um arquivo em que ela se encontra
-                        if (palavra_busca_arquivo(p, pag) == -1) {
-                            palavra_adiciona_arquivo(p, pag);
-                        }
+                        palavra_adiciona_arquivo(p, pag);
                     }
                 }
 
