@@ -32,6 +32,7 @@ Vector* palavra_retorna_arquivos(Palavra* p){
 }
 
 void palavra_destrutor(void* p) {
+    if(p!= NULL){
     Palavra *palavra = (Palavra*)p;
     vector_destroy_func(palavra->arquivos);
 
@@ -40,6 +41,7 @@ void palavra_destrutor(void* p) {
     }
 
     free(palavra);
+    }
 }
 
 char *palavra_obter_nome(Palavra *p) {

@@ -8,7 +8,7 @@ struct String {
 String *string_criar(char* c) {
     String *string = (String*)calloc(1,sizeof(String));
 
-    string->c = strdup(c);
+    string->c = c;
     string->tamanho = strlen(c);
 
     return string;

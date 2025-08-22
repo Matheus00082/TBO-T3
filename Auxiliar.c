@@ -1,5 +1,38 @@
 #include "Auxiliar.h"
 #include "Vector.h"
+#include <string.h> // Para strdup
+
+typedef struct {
+    char *chave_original; // Guarda a cópia da chave que será usada na TST
+    void *valor_original; // Guarda a Pagina*, Palavra*, etc.
+} nodeAux;
+
+// Destrutor para nodeAuxes que guardam Paginas
+void nodeAux_pagina_destrutor(void *ag_void) {
+    if (ag_void == NULL) return;
+    nodeAux *ag = (nodeAux *)ag_void;
+    free(ag->chave_original);
+    pagina_destrutor(ag->valor_original);
+    free(ag);
+}
+
+// Destrutor para nodeAuxes que guardam stop words (char*)
+void nodeAux_stopwords_destrutor(void *ag_void) {
+    if (ag_void == NULL) return;
+    nodeAux *ag = (nodeAux *)ag_void;
+    free(ag->chave_original);
+    //free(ag->valor_original); // O valor aqui também é um strdup
+    free(ag);
+}
+
+// Destrutor para nodeAuxes que guardam Palavras
+void nodeAux_palavra_destrutor(void *ag_void) {
+    if (ag_void == NULL) return;
+    nodeAux *ag = (nodeAux *)ag_void;
+    palavra_destrutor(ag->valor_original);
+    free(ag->chave_original);
+    free(ag);
+}
 
 struct Auxiliar {
     char **linhas;
@@ -69,34 +102,24 @@ Auxiliar *ler_arquivo(const char *nomeArquivo) {
     return aux;
 }
 
-char **obter_linhas(Auxiliar *a) {
-    return a->linhas;
-}
-
-int obter_qtd_paginas(Auxiliar *a) {
-    return a->qtd_paginas;
-}
+char **obter_linhas(Auxiliar *a) { return a->linhas; }
+int obter_qtd_paginas(Auxiliar *a) { return a->qtd_paginas; }
 
 void destruir_auxiliar(Auxiliar *a) {
     if (a != NULL) {
-        for (int i = 0; i < a->qtd_paginas; i++) {
-            if (a->linhas[i] != NULL) {
-                free(a->linhas[i]);
-            }
-        }
+        free(a->linhas);
+
+        // CORRIGIDO: Usa os destrutores de nodeAux corretos.
         if (a->stop_words != NULL) {
-            tst_destruir(a->stop_words, free);
+            tst_destruir(a->stop_words, nodeAux_stopwords_destrutor);
         }
-
         if (a->tabela_palavras != NULL) {
-            tst_destruir(a->tabela_palavras, palavra_destrutor);
+            tst_destruir(a->tabela_palavras, nodeAux_palavra_destrutor);
         }
-
         if (a->tabela_arquivos != NULL) {
-            tst_destruir(a->tabela_arquivos, pagina_destrutor);
+            tst_destruir(a->tabela_arquivos, nodeAux_pagina_destrutor);
         }
         
-        free(a->linhas);
         free(a);
     }
 }
@@ -108,11 +131,15 @@ void cria_arquivos(Auxiliar *a) {
 
     for (int i = 0; i < qtd_linhas; i++) {
         char *nome_pagina = linhas[i];
-        String *string = string_criar(nome_pagina);
-        //printf("%c\n", get_caractere_string(string, 0));
+        
+        // CORRIGIDO: Cria o valor e o nodeAux para inserção segura.
         Pagina *pagina = pagina_construtor(nome_pagina, qtd_linhas);
-        tst_inserir(tabela, string, pagina);
-        //string_destruir(string);
+        
+        nodeAux *ag = malloc(sizeof(nodeAux));
+        ag->chave_original = strdup(nome_pagina); // A TST agora tem sua própria cópia da chave.
+        ag->valor_original = pagina;
+
+        tst_inserir(tabela, ag->chave_original, ag);
     }
     a->tabela_arquivos = tabela;
 }
@@ -120,7 +147,6 @@ void cria_arquivos(Auxiliar *a) {
 void cria_stop_words(Auxiliar *a, char const *pasta) {
     char caminho_arquivo[256];
     snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/stopwords.txt", pasta);
-
     FILE *arquivo_stop_words = fopen(caminho_arquivo, "r");
     TST *tabela = tst_criar();
     char *buffer = NULL;
@@ -128,23 +154,27 @@ void cria_stop_words(Auxiliar *a, char const *pasta) {
 
     while (getline(&buffer, &tamanho_linha, arquivo_stop_words) != -1) {
         buffer[strcspn(buffer, "\n")] = 0;
-        String *string = string_criar(strdup(buffer));
-        tst_inserir(tabela, string, strdup(buffer));
-    }
+        
+        if (tst_buscar(tabela, buffer) != NULL) {
+            // A palavra já foi inserida. Pule para a próxima.
+            continue;
+        }
+        
+        nodeAux *ag = calloc(1, sizeof(nodeAux));
+        ag->chave_original = strdup(buffer);
+        ag->valor_original = ag->chave_original;
 
+        tst_inserir(tabela, ag->chave_original, ag);
+    }
     fclose(arquivo_stop_words);
-
-    if (buffer != NULL) {
-        free(buffer);
-    }
-    
+    if (buffer != NULL) free(buffer);
     a->stop_words = tabela;
 }
 
 void cria_palavras(Auxiliar *a, char const *pasta) {
     int qtd_arquivos = a->qtd_paginas;
     char **nome_arquivos = obter_linhas(a);
-    TST *tabela = tst_criar();
+    TST *tabela = tst_criar(); // CORRIGIDO: Usar a tabela local para construção.
 
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s/pages", pasta);
@@ -152,99 +182,81 @@ void cria_palavras(Auxiliar *a, char const *pasta) {
     for (int i = 0; i < qtd_arquivos; i++) {
         char caminho_arquivo[512];
         char *nome_arquivo = nome_arquivos[i];
-        String* string_arquivo = string_criar(strdup(nome_arquivo));
         snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/%s", caminho, nome_arquivo);
         FILE *arquivo = fopen(caminho_arquivo, "r");
+        if (arquivo == NULL) continue;
 
-        if (arquivo == NULL) {
-            printf("Erro ao abrir o arquivo: %s\n", caminho_arquivo);
-            continue;
-        }
+        // CORRIGIDO: Pega a página usando o nodeAux.
+        nodeAux* ag_pagina = (nodeAux*)tst_buscar(a->tabela_arquivos, nome_arquivo);
+        if (ag_pagina == NULL) { fclose(arquivo); continue; }
+        Pagina* pag = (Pagina*)ag_pagina->valor_original;
 
         char *buffer = NULL;
         size_t tamanho_buffer = 0;
-
         while (getline(&buffer, &tamanho_buffer, arquivo) != -1) {
-            char *buffer_palavra = strtok(buffer, " \t\n"); // Tokeniza a linha por espaços, tabulacoes ou quebras de linha
-            String *string = string_criar(strdup(buffer_palavra));
-            
+            char *buffer_palavra = strtok(buffer, " \t\n");
             while (buffer_palavra != NULL) {
-                if (tst_buscar(a->stop_words, string) == NULL) {  // Se a palavra nao eh stop word, ela eh adicionada na tabela de palavras 
-                    String* string_palavra = string_criar(strdup(buffer_palavra));
-                    Palavra* p = (Palavra*)tst_buscar(a->tabela_palavras, string_palavra);
-                    Pagina* pag = tst_buscar(a->tabela_arquivos, string_arquivo);
-                    //Palavra *p = (Palavra *)arvore_rn_buscar(tabela, buffer_palavra);
-                    //Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_arquivo);
-
-                    if (p == NULL) {    // Se a palavra ainda nao esta na tabela, adiciona com o arquivo em que se encontra
-                        p = palavra_construtor(buffer_palavra);
-                        palavra_adiciona_arquivo(p, pag);
-                        tst_inserir(a->tabela_palavras, string_palavra, p);
-                        //arvore_rn_inserir(tabela, buffer_palavra, p, palavra_destrutor);
-                    }
-                    else {      // Se a palavra ja esta na tabela, so precisa adicionar mais um arquivo em que ela se encontra
-                        if (palavra_busca_arquivo(p, pag) == -1) {
-                            palavra_adiciona_arquivo(p, pag);
+                if (tst_buscar(a->stop_words, buffer_palavra) == NULL) {
+                    // CORRIGIDO: Busca na tabela local e extrai valor do nodeAux.
+                    nodeAux* ag_palavra = (nodeAux*)tst_buscar(tabela, buffer_palavra);
+                    
+                    if (ag_palavra == NULL) {
+                        // Palavra nova, precisa criar chave permanente, valor e nodeAux.
+                        char* chave_permanente = strdup(buffer_palavra);
+                        Palavra* p_novo = palavra_construtor(chave_permanente);
+                        palavra_adiciona_arquivo(p_novo, pag);
+                        
+                        nodeAux* ag_novo = malloc(sizeof(nodeAux));
+                        ag_novo->chave_original = chave_permanente;
+                        ag_novo->valor_original = p_novo;
+                        
+                        tst_inserir(tabela, chave_permanente, ag_novo);
+                    } else {
+                        Palavra* p_existente = (Palavra*)ag_palavra->valor_original;
+                        if (palavra_busca_arquivo(p_existente, pag) == -1) {
+                            palavra_adiciona_arquivo(p_existente, pag);
                         }
                     }
-                    //string_destruir(string_palavra);
                 }
-
                 buffer_palavra = strtok(NULL, " \t\n");
             }
         }
-
         if (buffer != NULL) free(buffer);
-        if (arquivo != NULL) fclose(arquivo);
-        //string_destruir(string_arquivo);
+        fclose(arquivo);
     }
-    
-    a->tabela_palavras = tabela;
+    a->tabela_palavras = tabela; // CORRIGIDO: Atribui a tabela construída ao final.
 }
+
 
 void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
     FILE *arquivo = fopen(nomeArquivo, "r");
-
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo: %s\n", nomeArquivo);
-        return;
-    }
-
+    if (arquivo == NULL) return;
     char *buffer = NULL;
     size_t tamanho_linha = 0;
-
     while (getline(&buffer, &tamanho_linha, arquivo) != -1) {
         buffer[strcspn(buffer, "\n")] = 0;
         char *nome_pagina = strtok(buffer, " ");
-        String* string_pagina = string_criar(strdup(nome_pagina));
-        Pagina *pag = tst_buscar(a->tabela_arquivos, string_pagina);
+        
+        // CORRIGIDO: Extrai valor do nodeAux.
+        nodeAux* ag_pag = (nodeAux*)tst_buscar(a->tabela_arquivos, nome_pagina);
+        if (ag_pag == NULL) continue;
+        Pagina *pag = (Pagina*)ag_pag->valor_original;
 
         int qtd_links_saida = atoi(strtok(NULL, " "));
-
         for (int i = 0; i < qtd_links_saida; i++) {
             char *nome_link_saida = strtok(NULL, " ");
-            String* string_pag_saida = string_criar(strdup(nome_link_saida));
-            Pagina* pag_saida = tst_buscar(a->tabela_arquivos, string_pag_saida);
-            //Pagina *pag_saida = arvore_rn_buscar(a->tabela_arquivos, nome_link_saida);
-
-            if (pag_saida == NULL) {
-                continue;
-            }
+            
+            // CORRIGIDO: Extrai valor do nodeAux.
+            nodeAux* ag_pag_saida = (nodeAux*)tst_buscar(a->tabela_arquivos, nome_link_saida);
+            if (ag_pag_saida == NULL) continue;
+            Pagina* pag_saida = (Pagina*)ag_pag_saida->valor_original;
 
             pagina_adiciona_link_saida(pag, pag_saida);
             pagina_adiciona_link_entrada(pag_saida, pag);
-            //string_destruir(string_pag_saida);
         }
-        //string_destruir(string_pagina);
     }
-
-    if (buffer != NULL) {
-        free(buffer);
-    }
-
-    if (arquivo != NULL) {
-        fclose(arquivo);
-    }
+    if (buffer != NULL) free(buffer);
+    fclose(arquivo);
 }
 
 double calcula_pagerank_pagina(Pagina* pagina, int total_paginas) {
@@ -264,88 +276,68 @@ double calcula_pagerank_pagina(Pagina* pagina, int total_paginas) {
     
     return base + (ALFA * soma_in);
 }
-
 void calcula_pagerank_global(Auxiliar* a) {
     int total_paginas = a->qtd_paginas;
     char **nomes_paginas = obter_linhas(a);
-    
-    // Cria array com todas as páginas
     Pagina** todas_paginas = calloc(total_paginas, sizeof(Pagina*));
     
     for (int i = 0; i < total_paginas; i++) {
-        String* string_pagina = string_criar(strdup(nomes_paginas[i]));
-        todas_paginas[i] = tst_buscar(a->tabela_arquivos, string_pagina);
-        //string_destruir(string_pagina);
+        // CORRIGIDO: Extrai valor do nodeAux.
+        nodeAux* ag = (nodeAux*)tst_buscar(a->tabela_arquivos, nomes_paginas[i]);
+        if (ag != NULL) {
+            todas_paginas[i] = (Pagina*)ag->valor_original;
+        }
     }
     
-    // Algoritmo do Power Method para calcular PageRank
-    double erro = EPSILON + 1;
-    
-    while (erro >= EPSILON) {
+    // O resto da lógica do PageRank permanece a mesma...
+    double erro = 1000; // EPSILON + 1
+    while (erro >= 0.0001) { // EPSILON
         erro = 0;
-        // Calcula novos valores de PageRank para todas as páginas
         double *novos_pageranks = calloc(total_paginas, sizeof(double));
-        
         for (int i = 0; i < total_paginas; i++) {
             novos_pageranks[i] = calcula_pagerank_pagina(todas_paginas[i], total_paginas);
         }
-        
-        // Atualiza PageRanks e calcula erro
         for (int i = 0; i < total_paginas; i++) {
             double antigo = pagina_obter_pagerank(todas_paginas[i]);
             pagina_definir_pagerank(todas_paginas[i], novos_pageranks[i]);
             erro += fabs(novos_pageranks[i] - antigo);
         }
-        
         erro /= total_paginas;
         free(novos_pageranks);
     }
-    
     free(todas_paginas);
-}
-
-int compara_strings(const void *a, const void *b) {
-    const char * const *sa = a;  // ponteiro para elemento (char*)
-    const char * const *sb = b;
-    return strcasecmp(*sa, *sb); // ou strcmp se quiser case-sensitive
 }
 
 void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
     printf("search:%s\n", search_palavras);
+    char *palavra_token = strtok(search_palavras, " ");
+    Vector *palavras_encontradas = vector_construct(NULL);
 
-    char *palavra = strtok(search_palavras, " ");
-    Vector *palavras = vector_construct(NULL); // para armazenar as palavras encontradas
-
-    while (palavra != NULL) {
-        String* string_palavra = string_criar(strdup(palavra));
-        if (tst_buscar(a->stop_words, string_palavra) != NULL) {
-            palavra = strtok(NULL, " ");
-            continue; // Ignora stop words
+    while (palavra_token != NULL) {
+        if (tst_buscar(a->stop_words, palavra_token) != NULL) {
+            palavra_token = strtok(NULL, " ");
+            continue;
         }
 
-        Palavra *p = (Palavra *)tst_buscar(a->tabela_palavras, string_palavra);
-
-        if (p == NULL) {
-            // Palavra não encontrada - interseção será vazia
-            vector_destroy_func(palavras);
-            string_destruir(string_palavra);
-            printf("pages:\n");
-            printf("pr:\n");
+        // CORRIGIDO: Extrai valor do nodeAux.
+        nodeAux *ag = (nodeAux *)tst_buscar(a->tabela_palavras, palavra_token);
+        if (ag == NULL) {
+            vector_destroy_func(palavras_encontradas);
+            printf("pages:\npr:\n");
             return;
         }
         
-        vector_push_back(palavras, p);
-        //string_destruir(string_palavra);
-        palavra = strtok(NULL, " ");
+        vector_push_back(palavras_encontradas, ag->valor_original);
+        palavra_token = strtok(NULL, " ");
     }
     
-    Vector* arquivos =  palavra_retorna_arquivos_intersecao(palavras);
+    // O resto da lógica da busca permanece a mesma...
+    Vector* arquivos =  palavra_retorna_arquivos_intersecao(palavras_encontradas);
     vector_sort(arquivos, compara_paginas_por_pagerank);
     int qtd_arquivos = vector_size(arquivos);
     Pagina** paginas = calloc(qtd_arquivos, sizeof(Pagina*));
     printf("pages:");
     double pagerank[qtd_arquivos];
-
     for (int i = 0; i < qtd_arquivos; i++) {
         paginas[i] = vector_get(arquivos, i);
         printf("%s", pagina_obter_nome(paginas[i]));
@@ -374,7 +366,7 @@ void realiza_busca_palavras(Auxiliar* a, char* search_palavras) {
     }
 
     printf("\n");
-    vector_destroy_func(palavras);
+    vector_destroy_func(palavras_encontradas);
     vector_destroy_func(arquivos);
     free(paginas);
 }

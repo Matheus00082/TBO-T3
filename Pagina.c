@@ -97,19 +97,22 @@ void pagina_adiciona_link_saida(Pagina* pagina1, Pagina* pagina2){
 }
 
 void pagina_destrutor(void *dado) {
-    Pagina *a = (Pagina *)dado;
+    if(dado!= NULL){
+        Pagina *a = (Pagina *)dado;
 
-    if (a != NULL) {
+        if (a != NULL) {
 
-        if (a->nome != NULL) {
-            free(a->nome);
+            if (a->nome != NULL) {
+                free(a->nome);
+            }
+
+            if (a->links_entrada != NULL) {
+                free(a->links_entrada);
+            }
+
+
+            free(a);
         }
-
-        if (a->links_entrada != NULL) {
-            free(a->links_entrada);
-        }
-
-
-        free(a);
     }
+
 }

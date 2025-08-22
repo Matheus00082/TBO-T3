@@ -14,8 +14,8 @@ typedef void (*func_destruir)(void *elemento);
 TST *tst_criar();
 void tst_destruir(TST *tst, func_destruir destruir_elemento);
 
-TST *tst_inserir(TST *tst, String *chave, void *dado);
-void *tst_buscar(TST *tst, String *chave);
+TST *tst_inserir(TST *tst, char *chave, void *dado);
+void *tst_buscar(TST *tst, char *chave);
 
 void *get_valor(TST *tst);
 

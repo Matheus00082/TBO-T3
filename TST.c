@@ -9,7 +9,7 @@ struct NodeTST {
 };
 
 TST *tst_criar() {
-    TST *tst = (TST *)malloc(sizeof(TST));
+    TST *tst = (TST *)calloc(1, sizeof(TST));
 
     if (tst == NULL) {
         printf("Erro ao alocar memória para a TST.\n");
@@ -32,15 +32,18 @@ void tst_destruir(TST *tst, func_destruir destruir_elemento) {
         tst_destruir(tst->direita, destruir_elemento);
 
         if (destruir_elemento != NULL) {
-            destruir_elemento(tst->valor);
+            if(tst->valor!= NULL){
+                destruir_elemento(tst->valor);
+            }
+            
         }
 
         free(tst);
     }
 }
 
-TST *tst_inserir_recursivamente(TST *tst, String *chave, void *dado, int d) {
-    unsigned char c = get_caractere_string(chave, d);
+TST *tst_inserir_recursivamente(TST *tst, char *chave, void *dado, int d) {
+    unsigned char c = chave[d];
 
     if (tst == NULL) { 
         tst = tst_criar(); 
@@ -51,7 +54,7 @@ TST *tst_inserir_recursivamente(TST *tst, String *chave, void *dado, int d) {
         tst->esquerda = tst_inserir_recursivamente(tst->esquerda, chave, dado, d);
     } else if (c > tst->caractere) {
         tst->direita = tst_inserir_recursivamente(tst->direita, chave, dado, d);
-    } else if (d < get_tamanho(chave) -1) {
+    } else if (d < strlen(chave) -1) {
         tst->meio = tst_inserir_recursivamente(tst->meio, chave, dado, d+1);
     } else {
         tst->valor = dado;
@@ -60,29 +63,29 @@ TST *tst_inserir_recursivamente(TST *tst, String *chave, void *dado, int d) {
     return tst;
 }
 
-TST *tst_inserir(TST *tst, String *chave, void *dado) {
+TST *tst_inserir(TST *tst, char *chave, void *dado) {
     return tst_inserir_recursivamente(tst, chave, dado, 0);
 }
 
-TST *tst_buscar_recursivamente(TST *tst, String *chave, int d) {
+TST *tst_buscar_recursivamente(TST *tst, char *chave, int d) {
     if (tst == NULL) {
         return NULL;
     }
 
-    unsigned char c = get_caractere_string(chave, d);
+    unsigned char c = chave[d];
 
     if (c < tst->caractere) {
         return tst_buscar_recursivamente(tst->esquerda, chave, d);
     } else if (c > tst->caractere) {
         return tst_buscar_recursivamente(tst->direita, chave, d);
-    } else if (d < get_tamanho(chave) -1) {
+    } else if (d < strlen(chave) -1) {
         return tst_buscar_recursivamente(tst->meio, chave, d+1);
     } else {
         return tst;
     }
 }
 
-void *tst_buscar(TST *tst, String *chave) {
+void *tst_buscar(TST *tst, char *chave) {
     tst = tst_buscar_recursivamente(tst, chave, 0);
     
     if (tst == NULL) {
