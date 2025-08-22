@@ -10,6 +10,8 @@
 #include "Palavra.h"
 #include "TabelaHash.h"
 #include "ArvoreRN.h"
+#include "TST.h"
+#include "String.h"
 
 #define CAPACIDADE_INICIAL 50
 

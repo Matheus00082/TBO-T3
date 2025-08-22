@@ -6,9 +6,9 @@ struct String {
 };
 
 String *string_criar(char* c) {
-    String *string = (String*)malloc(sizeof(String));
+    String *string = (String*)calloc(1,sizeof(String));
 
-    string->c = c;
+    string->c = strdup(c);
     string->tamanho = strlen(c);
 
     return string;
