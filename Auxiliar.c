@@ -150,6 +150,7 @@ void cria_palavras(Auxiliar *a, char const *pasta) {
         char *nome_arquivo = nome_arquivos[i];
         snprintf(caminho_arquivo, sizeof(caminho_arquivo), "%s/%s", caminho, nome_arquivo);
         FILE *arquivo = fopen(caminho_arquivo, "r");
+        Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_arquivo);
 
         if (arquivo == NULL) {
             printf("Erro ao abrir o arquivo: %s\n", caminho_arquivo);
@@ -165,7 +166,6 @@ void cria_palavras(Auxiliar *a, char const *pasta) {
             while (string_palavra != NULL) {
                 if (arvore_rn_buscar(a->stop_words, string_palavra) == NULL) {  // Se a palavra nao eh stop word, ela eh adicionada na tabela de palavras 
                     Palavra *p = (Palavra *)arvore_rn_buscar(tabela, string_palavra);
-                    Pagina *pag = arvore_rn_buscar(a->tabela_arquivos, nome_arquivo);
 
                     if (p == NULL) {    // Se a palavra ainda nao esta na tabela, adiciona com o arquivo em que se encontra
                         p = palavra_construtor(string_palavra);

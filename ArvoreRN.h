@@ -8,8 +8,8 @@
 
 // Enum para as cores dos nós
 typedef enum {
-    VERMELHO,
-    PRETO
+    PRETO,
+    VERMELHO
 } Cor;
 
 // Estrutura da árvore rubro-negra

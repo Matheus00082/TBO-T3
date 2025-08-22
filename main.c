@@ -16,8 +16,12 @@ int main(int argc, char const *argv[]) {
     
     Auxiliar *aux = ler_arquivo(caminho_arquivo);
     cria_arquivos(aux);
+    fim = clock();
+    double tempo_total = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+    printf("TEMPO TOTAL:%lf\n",tempo_total );
     cria_stop_words(aux, nome_arquivo);
     cria_palavras(aux, nome_arquivo);
+    
 
     // 3.2 Google's PageRank
     caminho_arquivo[0] = '\0';  // limpa o buffer
@@ -41,8 +45,5 @@ int main(int argc, char const *argv[]) {
 
     free(buffer);
     destruir_auxiliar(aux);
-    fim = clock();
-    double tempo_total = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-    printf("TEMPO TOTAL:%lf\n",tempo_total );
     return 0;
 }

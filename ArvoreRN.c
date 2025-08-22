@@ -63,57 +63,40 @@ int NodeRN_get_tamanho(NodeRN *node) {
     return node->tamanho;
 }
 
-NodeRN *rotacao_esquerda(NodeRN *x) {
-    NodeRN *y = x->direita;
-    x->direita = y->esquerda;
-    y->esquerda = x;
-    y->cor = x->cor;
-    x->cor = VERMELHO; 
-    y->tamanho = x->tamanho;
+NodeRN *rotacao_esquerda(NodeRN *h) {
+    NodeRN *x = h->direita;
+    h->direita = x->esquerda;
+    x->esquerda = h;
+    x->cor = x->esquerda->cor;
+    x->esquerda->cor = VERMELHO;
+    h->tamanho = x->tamanho;
     x->tamanho = 1 + NodeRN_get_tamanho(x->esquerda) + NodeRN_get_tamanho(x->direita);
-    return y;
+    return x;
 }
 
-NodeRN *rotacao_direita(NodeRN *x) {
-    NodeRN *y = x->esquerda;
-    x->esquerda = y->direita;
-    y->direita = x;
-    y->cor = x->cor;
-    x->cor = VERMELHO; 
-    y->tamanho = x->tamanho;
+NodeRN *rotacao_direita(NodeRN *h) {
+    NodeRN *x = h->esquerda;
+    h->esquerda = x->direita;
+    x->direita = h;
+    x->cor = x->direita->cor;
+    x->direita->cor = VERMELHO;
+    h->tamanho = x->tamanho;
     x->tamanho = 1 + NodeRN_get_tamanho(x->esquerda) + NodeRN_get_tamanho(x->direita);
-    return y;
+    return x;
 }
 
-void mudar_cor(NodeRN *x) {
-    x->cor = VERMELHO;
-    x->esquerda->cor = PRETO;
-    x->direita->cor = PRETO;
+void mudar_cor(NodeRN *h) {
+    h->cor = VERMELHO;
+    h->esquerda->cor = PRETO;
+    h->direita->cor = PRETO;
 }
 
 int eh_vermelho(NodeRN *node) {
-    return node != NULL && node->cor == VERMELHO;
-}
-
-int eh_preto(NodeRN *node) {
-    return node == NULL || node->cor == PRETO;
-}
-
-NodeRN *buscar_node(NodeRN *node, char *chave) {
-    while (node != NULL && strcasecmp(chave, node->chave) != 0) {
-        if (strcasecmp(chave, node->chave) < 0) {
-            node = node->esquerda;
-        } 
-        else {
-            node = node->direita;
-        }
-    }
-
     if (node == NULL) {
-        return NULL;
+        return PRETO;
     }
 
-    return node;
+    return node->cor;
 }
 
 void imprimir_node(NodeRN *node, int nivel) {
@@ -148,41 +131,41 @@ void arvore_rn_destruir(ArvoreRN *arvore, func_destruir destruir_elemento) {
     }
 }
 
-NodeRN *inserir_node(NodeRN *x, char *chave, void *valor, func_destruir destruir_elemento) {
-    if (x == NULL) {
+NodeRN *inserir_node(NodeRN *h, char *chave, void *valor, func_destruir destruir_elemento) {
+    if (h == NULL) {
         return criar_node_rn(chave, valor);
     }
 
-    int cmp = strcasecmp(chave, x->chave);
+    int cmp = strcasecmp(chave, h->chave);
 
     if (cmp < 0) {
-        x->esquerda = inserir_node(x->esquerda, chave, valor, destruir_elemento);
+        h->esquerda = inserir_node(h->esquerda, chave, valor, destruir_elemento);
     } 
     else if (cmp > 0) {
-        x->direita = inserir_node(x->direita, chave, valor, destruir_elemento);
+        h->direita = inserir_node(h->direita, chave, valor, destruir_elemento);
     } 
     else {
-        if (x->valor != NULL) {
-            destruir_elemento(x->valor);
+        if (h->valor != NULL) {
+            destruir_elemento(h->valor);
         }
-        
-        x->valor = valor;
+
+        h->valor = valor;
     }
 
-    if (eh_vermelho(x->direita) && !eh_vermelho(x->esquerda)) {
-        x = rotacao_esquerda(x);
+    if (eh_vermelho(h->direita) && !eh_vermelho(h->esquerda)) {
+        h = rotacao_esquerda(h);
     }
 
-    if (eh_vermelho(x->esquerda) && eh_vermelho(x->esquerda->esquerda)) {
-        x = rotacao_direita(x);
+    if (eh_vermelho(h->esquerda) && eh_vermelho(h->esquerda->esquerda)) {
+        h = rotacao_direita(h);
     }
 
-    if (eh_vermelho(x->esquerda) && eh_vermelho(x->direita)) {
-        mudar_cor(x);
+    if (eh_vermelho(h->esquerda) && eh_vermelho(h->direita)) {
+        mudar_cor(h);
     }
 
-    x->tamanho = NodeRN_get_tamanho(x->esquerda) + NodeRN_get_tamanho(x->direita) + 1;
-    return x;
+    h->tamanho = 1 + NodeRN_get_tamanho(h->esquerda) + NodeRN_get_tamanho(h->direita);
+    return h;
 }
 
 void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *valor, func_destruir destruir_elemento) {
@@ -191,12 +174,23 @@ void arvore_rn_inserir(ArvoreRN *arvore, char *chave, void *valor, func_destruir
 }
 
 void *arvore_rn_buscar(ArvoreRN *arvore, char *chave) {
-    if (arvore == NULL || chave == NULL) {
-        return NULL;
+    NodeRN *node = arvore->raiz;
+
+    while (node != NULL) {
+        int cmp = strcasecmp(chave, node->chave);
+
+        if (cmp < 0) {
+            node = node->esquerda;
+        } 
+        else if (cmp > 0) {
+            node = node->direita;
+        }
+        else {
+            return node->valor;
+        }
     }
 
-    NodeRN *no = buscar_node(arvore->raiz, chave);
-    return NodeRN_get_valor(no);
+    return NULL; 
 }
 
 void arvore_rn_imprimir(ArvoreRN *arvore) {
