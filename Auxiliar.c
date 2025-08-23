@@ -252,16 +252,13 @@ void calcula_pagerank_global(Auxiliar* a) {
         todas_paginas[i] = arvore_rn_buscar(a->tabela_arquivos, nomes_paginas[i]);
     }
     
-    // Loop principal do PageRank
     while (1) {
         double erro = 0.0;
         
-        // PASSO 1: Calcular novos PageRanks usando valores ANTIGOS
+        // Calcular novos PageRanks usando valores antigos
         // Todos os cálculos usam os valores da iteração anterior
         for (int i = 0; i < total_paginas; i++) {
             Pagina* pagina = todas_paginas[i];
-            
-            // Resetar para 0
             double novo_pr = 0.0;
             
             // Somar contribuições dos links de entrada
@@ -271,14 +268,15 @@ void calcula_pagerank_global(Auxiliar* a) {
                 Pagina* origem = pagina_obter_link_entrada(pagina, j);
                 int qtd_links_saida = pagina_obter_qtd_links_saida(origem);
                 
-                // Usar o PageRank ANTIGO (atual) da origem
-                // Não verificar se qtd_links_saida > 0 pois só páginas com saída > 0 
+                // Usar o PageRank antigo (atual) da origem
                 // foram adicionadas como links de entrada (devido ao if na inicializa_arquivos)
                 double pagerank_origem = pagina_obter_pagerank(origem);
-                novo_pr += pagerank_origem / (double)qtd_links_saida;
+
+                if (qtd_links_saida > 0) {
+                    novo_pr += pagerank_origem / (double)qtd_links_saida;
+                }
             }
             
-            // Multiplicar por ALFA
             novo_pr *= ALFA;
             
             // Adicionar termo base (damping)
@@ -301,7 +299,7 @@ void calcula_pagerank_global(Auxiliar* a) {
             erro += func_abs(novo_pr - pagerank_antigo);
         }
         
-        // PASSO 2: Atualizar todos os PageRanks de uma vez
+        // Atualizar todos os PageRanks de uma vez
         for (int i = 0; i < total_paginas; i++) {
             pagina_definir_pagerank(todas_paginas[i], novo_pagerank[i]);
         }
