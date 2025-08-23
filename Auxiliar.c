@@ -228,59 +228,92 @@ void inicializa_arquivos(const char *nomeArquivo, Auxiliar *a) {
     }
 }
 
-double calcula_pagerank_pagina(Pagina* pagina, int total_paginas) {
-    double base = (1.0 - ALFA) / (double)total_paginas;
-    double soma_in = 0.0;
-
-    int qtd_links_entrada = pagina_obter_qtd_links_entrada(pagina);
-
-    for (int j = 0; j < qtd_links_entrada; j++) {
-        Pagina* origem = pagina_obter_link_entrada(pagina, j);
-        int qtd_links_saida = pagina_obter_qtd_links_saida(origem);
-        
-        if (qtd_links_saida > 0) {
-            soma_in += pagina_obter_pagerank(origem) / (double)qtd_links_saida;
-        }
-    }
-    
-    return base + (ALFA * soma_in);
+double func_abs(double x) {
+    return x < 0 ? -x : x;
 }
 
 void calcula_pagerank_global(Auxiliar* a) {
     int total_paginas = a->qtd_paginas;
     char **nomes_paginas = obter_linhas(a);
     
-    // Cria array com todas as páginas
+    // Arrays para todas as páginas e seus novos pageranks
     Pagina** todas_paginas = calloc(total_paginas, sizeof(Pagina*));
+    double* novo_pagerank = calloc(total_paginas, sizeof(double));
     
+    if (todas_paginas == NULL || novo_pagerank == NULL) {
+        printf("Erro ao alocar memória para PageRank\n");
+        if (todas_paginas) free(todas_paginas);
+        if (novo_pagerank) free(novo_pagerank);
+        return;
+    }
+    
+    // Preencher array com todas as páginas
     for (int i = 0; i < total_paginas; i++) {
         todas_paginas[i] = arvore_rn_buscar(a->tabela_arquivos, nomes_paginas[i]);
     }
     
-    // Algoritmo do Power Method para calcular PageRank
-    double erro = EPSILON + 1;
-    
-    while (erro >= EPSILON) {
-        erro = 0;
-        // Calcula novos valores de PageRank para todas as páginas
-        double *novos_pageranks = calloc(total_paginas, sizeof(double));
+    // Loop principal do PageRank
+    while (1) {
+        double erro = 0.0;
         
+        // PASSO 1: Calcular novos PageRanks usando valores ANTIGOS
+        // Todos os cálculos usam os valores da iteração anterior
         for (int i = 0; i < total_paginas; i++) {
-            novos_pageranks[i] = calcula_pagerank_pagina(todas_paginas[i], total_paginas);
+            Pagina* pagina = todas_paginas[i];
+            
+            // Resetar para 0
+            double novo_pr = 0.0;
+            
+            // Somar contribuições dos links de entrada
+            int qtd_links_entrada = pagina_obter_qtd_links_entrada(pagina);
+
+            for (int j = 0; j < qtd_links_entrada; j++) {
+                Pagina* origem = pagina_obter_link_entrada(pagina, j);
+                int qtd_links_saida = pagina_obter_qtd_links_saida(origem);
+                
+                // Usar o PageRank ANTIGO (atual) da origem
+                // Não verificar se qtd_links_saida > 0 pois só páginas com saída > 0 
+                // foram adicionadas como links de entrada (devido ao if na inicializa_arquivos)
+                double pagerank_origem = pagina_obter_pagerank(origem);
+                novo_pr += pagerank_origem / (double)qtd_links_saida;
+            }
+            
+            // Multiplicar por ALFA
+            novo_pr *= ALFA;
+            
+            // Adicionar termo base (damping)
+            novo_pr += (1.0 - ALFA) / (double)total_paginas;
+            
+            // Tratamento especial para páginas sem links de saída (dangling nodes)
+            int qtd_links_saida = pagina_obter_qtd_links_saida(pagina);
+
+            if (qtd_links_saida == 0) {
+                // A página distribui toda sua probabilidade igualmente
+                double pagerank_atual = pagina_obter_pagerank(pagina);
+                novo_pr += ALFA * pagerank_atual;
+            }
+            
+            // Armazenar o novo valor temporariamente
+            novo_pagerank[i] = novo_pr;
+            
+            // Calcular erro absoluto para convergência
+            double pagerank_antigo = pagina_obter_pagerank(pagina);
+            erro += func_abs(novo_pr - pagerank_antigo);
         }
         
-        // Atualiza PageRanks e calcula erro
+        // PASSO 2: Atualizar todos os PageRanks de uma vez
         for (int i = 0; i < total_paginas; i++) {
-            double antigo = pagina_obter_pagerank(todas_paginas[i]);
-            pagina_definir_pagerank(todas_paginas[i], novos_pageranks[i]);
-            erro += fabs(novos_pageranks[i] - antigo);
+            pagina_definir_pagerank(todas_paginas[i], novo_pagerank[i]);
         }
         
-        erro /= total_paginas;
-        free(novos_pageranks);
+        // Verificar convergência
+        if ((erro / (double)total_paginas) < EPSILON) {
+            break;
+        }
     }
     
     free(todas_paginas);
+    free(novo_pagerank);
 }
 
 int compara_strings(const void *a, const void *b) {
